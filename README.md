@@ -24,39 +24,61 @@ Accessibility Focus: Designed to be inclusive and accessible to all users.
 
 The pressures of academic life can take a toll on mental health, and we believe students deserve accessible, non-judgmental support. Project Psyche empowers users to build resilience, gain self-awareness, and develop healthy coping mechanisms in a safe and empathetic digital space.
 
+
 🚀 Getting Started
 
 Follow these steps to start using Project Psyche:
 
 Sign Up: Create an account with your email to start your journey.
+
 Check-In: Start with a quick mood check-in and engage in conversations tailored to your needs.
+
 Explore Insights: Dive into personalised visualisations to better understand your emotional trends.
+
 Grow: Use CBT-inspired tips and insights to navigate academic challenges with confidence.
+
+
 🛠️ Tech Stack
 
 Frontend: React.js
+
 Backend: Node.js, Express.js
+
 AI Integration: OpenAI GPT, Sentiment Analysis models
+
 Database: MongoDB (encrypted)
+
 Visualisations: Chart.js or D3.js
+
 Security: HTTPS, AES encryption
+
+
 🤝 Contributing
 
 We welcome contributions! If you have ideas, suggestions, or technical skills you'd like to share, follow these steps:
 
 Fork the repository.
+
 Create a feature branch: git checkout -b feature/your-feature-name.
+
 Commit your changes: git commit -m 'Add your feature here'.
+
 Push to the branch: git push origin feature/your-feature-name.
+
 Create a Pull Request.
+
+
 📜 License
 
 This project is licensed under the MIT License.
+
 
 📫 Contact
 
 For questions or support, feel free to reach out:
 
 Email: support@projectpsyche.app
+
 Website: www.projectpsyche.app
+
 Join us in revolutionising mental health support for students. 💙
