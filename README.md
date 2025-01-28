@@ -40,32 +40,32 @@ Grow: Use CBT-inspired tips and insights to navigate academic challenges with co
 
 🛠️ Tech Stack
 
-Frontend: React.js
+- Frontend: React.js
 
-Backend: Node.js, Express.js
+- Backend: Node.js, Express.js
 
-AI Integration: OpenAI GPT, Sentiment Analysis models
+- AI Integration: OpenAI GPT, Sentiment Analysis models
 
-Database: MongoDB (encrypted)
+- Database: MongoDB (encrypted)
 
-Visualisations: Chart.js or D3.js
+- Visualisations: Chart.js or D3.js
 
-Security: HTTPS, AES encryption
+- Security: HTTPS, AES encryption
 
 
 🤝 Contributing
 
 We welcome contributions! If you have ideas, suggestions, or technical skills you'd like to share, follow these steps:
 
-Fork the repository.
+1. Fork the repository.
 
-Create a feature branch: git checkout -b feature/your-feature-name.
+2. Create a feature branch: git checkout -b feature/your-feature-name.
 
-Commit your changes: git commit -m 'Add your feature here'.
+3. Commit your changes: git commit -m 'Add your feature here'.
 
-Push to the branch: git push origin feature/your-feature-name.
+4. Push to the branch: git push origin feature/your-feature-name.
 
-Create a Pull Request.
+5. Create a Pull Request.
 
 
 📜 License
