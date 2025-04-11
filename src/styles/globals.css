@@ -1,0 +1,290 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #121212;
+  --secondary: #2A2A2A;
+  --accent: rgba(255, 255, 255, 0.8);
+  --interactive: #8A8A8A;
+  --highlight: #E0E0E0;
+  --transition-ease: all 0.3s ease;
+  --blur-effect: 8px;
+  --border-radius: 12px;
+}
+
+body {
+  font-family: "SF Pro Display", "Inter", sans-serif;
+  background-color: var(--primary);
+  margin: 0;
+  padding: 0;
+  color: white;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: auto;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%);
+  position: relative;
+  overflow-y: visible;
+  overflow-x: hidden;
+}
+
+.app-content {
+  max-width: 1200px;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
+  gap: 0.5rem;
+}
+
+.app-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0rem;
+  text-align: center;
+  color: var(--accent);
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+  z-index: 10;
+}
+
+/* Mascot Section */
+.mascot-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  position: relative;
+  z-index: 5;
+}
+
+.mascot-sphere {
+  position: relative;
+  border-radius: 50%;
+  background-color: rgba(20, 20, 20, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4),
+    0 0 50px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(var(--blur-effect));
+  overflow: visible;
+  margin: 0 auto;
+}
+
+/* Center mood interface */
+.mood-interface {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 2rem;
+  z-index: 1;
+}
+
+/* Mood Tracker Component */
+.mood-tracker {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.mood-card {
+  background-color: var(--secondary);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(var(--blur-effect));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: var(--transition-ease);
+}
+
+.mood-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--highlight);
+}
+
+.mood-value-container {
+  margin-bottom: 2rem;
+}
+
+.mood-label {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--accent);
+}
+
+.mood-prompt {
+  font-size: 1rem;
+  color: var(--interactive);
+  text-align: center;
+  margin-bottom: 2rem;
+  min-height: 3rem;
+}
+
+.mood-save-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: var(--border-radius);
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition-ease);
+}
+
+.mood-save-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+/* Mood Slider Component */
+.mood-slider-container {
+  width: 100%;
+  padding: 0.5rem 0;
+}
+
+.mood-slider-track {
+  position: relative;
+  height: 8px;
+  width: 100%;
+  border-radius: 4px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.mood-slider-progress {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 0;
+  transition: var(--transition-ease);
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.mood-slider-handle {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: grab;
+  transition: var(--transition-ease);
+  z-index: 10;
+}
+
+.mood-slider-handle:active {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+/* Navigation Component */
+.navigation {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  z-index: 1;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--secondary);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(var(--blur-effect));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: var(--transition-ease);
+  position: relative;
+  color: var(--interactive);
+}
+
+.nav-item.active {
+  color: var(--accent);
+}
+
+.nav-icon {
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.nav-active-indicator {
+  position: absolute;
+  bottom: -6px;
+  margin-left: auto;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 1.5px;
+  background-color: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--accent);
+  align-self: center;
+}
+
+.nav-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .app-content {
+    padding: 1rem;
+  }
+
+  .app-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .mood-card {
+    padding: 1.5rem;
+  }
+
+  .nav-container {
+    padding: 0.75rem;
+  }
+
+  .nav-item {
+    padding: 0.25rem 0.5rem;
+  }
+
+  .nav-label {
+    font-size: 0.7rem;
+  }
+}

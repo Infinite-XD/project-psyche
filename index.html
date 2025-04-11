@@ -1,15 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../styles.css">
-    <title>Project Psyche</title>
-    <script src="scripts.js"></script> 
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Psyche</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <style>
+    @font-face {
+      font-family: 'SF Pro Display';
+      src: url('https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-regular-webfont.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'SF Pro Display';
+      src: url('https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-medium-webfont.woff2') format('woff2');
+      font-weight: 500;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'SF Pro Display';
+      src: url('https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-bold-webfont.woff2') format('woff2');
+      font-weight: 700;
+      font-style: normal;
+    }
+    
+    :root {
+      --background: 0 0% 7%;
+      --foreground: 0 0% 98%;
+      --card: 0 0% 13%;
+      --card-foreground: 0 0% 98%;
+      --popover: 0 0% 13%;
+      --popover-foreground: 0 0% 98%;
+      --primary: 0 0% 100%;
+      --primary-foreground: 0 0% 9%;
+      --secondary: 0 0% 16%;
+      --secondary-foreground: 0 0% 98%;
+      --muted: 0 0% 16%;
+      --muted-foreground: 0 0% 63.9%;
+      --accent: 0 0% 16%;
+      --accent-foreground: 0 0% 98%;
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 0 0% 98%;
+      --border: 0 0% 16%;
+      --input: 0 0% 16%;
+      --ring: 0 0% 100%;
+      --radius: 0.75rem;
+    }
+  </style>
 </head>
 <body>
-<h1>This is an amazing heading</h1>   
-<p>im not failing haha</p>
+  <div id="root"></div>
+  <script type="module" src="src/main.tsx"></script>
 </body>
-
 </html>
