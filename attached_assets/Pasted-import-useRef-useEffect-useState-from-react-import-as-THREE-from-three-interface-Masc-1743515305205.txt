@@ -1,0 +1,223 @@
+import { useRef, useEffect, useState } from "react";
+import * as THREE from "three";
+
+interface MascotProps {
+  size?: number;
+  showChat?: boolean;
+}
+
+export default function Mascot({ size = 200, showChat = false }: MascotProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [currentMood, setCurrentMood] = useState<string>("calm");
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    // Setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+    
+    const renderer = new THREE.WebGLRenderer({ 
+      alpha: true, 
+      antialias: true 
+    });
+    renderer.setSize(size, size);
+    renderer.setClearColor(0x000000, 0);
+    
+    containerRef.current.innerHTML = "";
+    containerRef.current.appendChild(renderer.domElement);
+    
+    // Create sphere geometry
+    const geometry = new THREE.SphereGeometry(5, 32, 32);
+    
+    // Color based on mood
+    let sphereColor = new THREE.Color(0x6495ED); // Default calm blue
+    let emissiveColor = new THREE.Color(0x4169E1);
+    
+    if (showChat) {
+      // If in chat mode, use a gentle blue glow
+      sphereColor = new THREE.Color(0x6495ED);
+      emissiveColor = new THREE.Color(0x4169E1);
+    } else {
+      // Get latest mood from localStorage if available
+      const storedMood = localStorage.getItem("lastMood");
+      if (storedMood) {
+        const moodData = JSON.parse(storedMood);
+        setCurrentMood(moodData.label.toLowerCase());
+        
+        // Set colors based on mood
+        switch (moodData.label.toLowerCase()) {
+          case "happy":
+            sphereColor = new THREE.Color(0xFFD700); // Gold
+            emissiveColor = new THREE.Color(0xDAA520);
+            break;
+          case "calm":
+            sphereColor = new THREE.Color(0x6495ED); // Cornflower blue
+            emissiveColor = new THREE.Color(0x4169E1);
+            break;
+          case "neutral":
+            sphereColor = new THREE.Color(0xA9A9A9); // Dark gray
+            emissiveColor = new THREE.Color(0x8A8A8A);
+            break;
+          case "sad":
+            sphereColor = new THREE.Color(0x7B68EE); // Medium slate blue
+            emissiveColor = new THREE.Color(0x6354CB);
+            break;
+          case "angry":
+            sphereColor = new THREE.Color(0xFF6347); // Tomato red
+            emissiveColor = new THREE.Color(0xE03420);
+            break;
+          default:
+            // Default to calm
+            sphereColor = new THREE.Color(0x6495ED);
+            emissiveColor = new THREE.Color(0x4169E1);
+        }
+      }
+    }
+    
+    // Create gradient material
+    const material = new THREE.MeshPhongMaterial({
+      color: sphereColor,
+      emissive: emissiveColor,
+      emissiveIntensity: 0.4,
+      transparent: true,
+      opacity: 0.9,
+      shininess: 90
+    });
+    
+    const sphere = new THREE.Mesh(geometry, material);
+    scene.add(sphere);
+    
+    // Add lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(ambientLight);
+    
+    const light = new THREE.PointLight(0xffffff, 1, 100);
+    light.position.set(10, 10, 10);
+    scene.add(light);
+    
+    // Position camera
+    camera.position.z = 15;
+    
+    // Add face features
+    // Left eye
+    const leftEyeGeometry = new THREE.SphereGeometry(0.8, 32, 32);
+    const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    const leftEye = new THREE.Mesh(leftEyeGeometry, eyeMaterial);
+    leftEye.position.set(-1.5, 1, 4.5);
+    sphere.add(leftEye);
+    
+    // Right eye
+    const rightEyeGeometry = new THREE.SphereGeometry(0.8, 32, 32);
+    const rightEye = new THREE.Mesh(rightEyeGeometry, eyeMaterial);
+    rightEye.position.set(1.5, 1, 4.5);
+    sphere.add(rightEye);
+    
+    // Create the mouth
+    let smile;
+    if (currentMood === "sad") {
+      // Sad mouth (inverted smile)
+      const smileGeometry = new THREE.TorusGeometry(1.2, 0.3, 16, 32, Math.PI);
+      const smileMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+      smile = new THREE.Mesh(smileGeometry, smileMaterial);
+      smile.position.set(0, -1, 4.5);
+      smile.rotation.z = Math.PI; // Rotate to make it a frown
+    } else if (currentMood === "angry") {
+      // Angry mouth (straight line with downturned edges)
+      const mouthGeometry = new THREE.BoxGeometry(2.4, 0.3, 0.3);
+      const mouthMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+      smile = new THREE.Mesh(mouthGeometry, mouthMaterial);
+      smile.position.set(0, -1.2, 4.5);
+      
+      // Add angry eyebrows
+      const leftBrowGeometry = new THREE.BoxGeometry(1.2, 0.3, 0.3);
+      const leftBrow = new THREE.Mesh(leftBrowGeometry, eyeMaterial);
+      leftBrow.position.set(-1.5, 2.2, 4.5);
+      leftBrow.rotation.z = Math.PI / 6; // Angle for angry look
+      sphere.add(leftBrow);
+      
+      const rightBrowGeometry = new THREE.BoxGeometry(1.2, 0.3, 0.3);
+      const rightBrow = new THREE.Mesh(rightBrowGeometry, eyeMaterial);
+      rightBrow.position.set(1.5, 2.2, 4.5);
+      rightBrow.rotation.z = -Math.PI / 6; // Angle for angry look
+      sphere.add(rightBrow);
+    } else if (currentMood === "neutral") {
+      // Neutral mouth (straight line)
+      const mouthGeometry = new THREE.BoxGeometry(2.4, 0.3, 0.3);
+      const mouthMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+      smile = new THREE.Mesh(mouthGeometry, mouthMaterial);
+      smile.position.set(0, -1.2, 4.5);
+    } else {
+      // Happy/Calm mouth (smile)
+      const smileGeometry = new THREE.TorusGeometry(1.2, 0.3, 16, 32, Math.PI);
+      const smileMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+      smile = new THREE.Mesh(smileGeometry, smileMaterial);
+      smile.position.set(0, -1, 4.5);
+      smile.rotation.x = Math.PI;
+    }
+    sphere.add(smile);
+    
+    // Animation function
+    const animate = () => {
+      const animationId = requestAnimationFrame(animate);
+      
+      // Gentle floating animation
+      sphere.position.y = Math.sin(Date.now() * 0.001) * 0.5;
+      
+      // Gentle rotation
+      sphere.rotation.y += 0.003;
+      
+      renderer.render(scene, camera);
+      
+      // Cleanup function
+      return () => {
+        cancelAnimationFrame(animationId);
+        geometry.dispose();
+        material.dispose();
+        renderer.dispose();
+      };
+    };
+    
+    const cleanup = animate();
+    
+    // Mouse hover event for interactivity
+    const handleMouseMove = (event: MouseEvent) => {
+      if (!containerRef.current) return;
+      
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      
+      // Move the sphere slightly towards the mouse
+      sphere.rotation.x = y * 0.3;
+      sphere.rotation.y = x * 0.3;
+      
+      // Change emissive intensity based on mouse position
+      const distance = Math.sqrt(x * x + y * y);
+      material.emissiveIntensity = 0.4 + distance * 0.2;
+    };
+    
+    // Add event listeners
+    containerRef.current.addEventListener("mousemove", handleMouseMove);
+    containerRef.current.addEventListener("mouseenter", () => setIsHovered(true));
+    containerRef.current.addEventListener("mouseleave", () => setIsHovered(false));
+    
+    return () => {
+      cleanup();
+      if (containerRef.current) {
+        containerRef.current.removeEventListener("mousemove", handleMouseMove);
+        containerRef.current.removeEventListener("mouseenter", () => setIsHovered(true));
+        containerRef.current.removeEventListener("mouseleave", () => setIsHovered(false));
+      }
+    };
+  }, [size, currentMood, showChat]);
+
+  return (
+    <div 
+      ref={containerRef} 
+      className={`w-[${size}px] h-[${size}px] relative ${isHovered ? "cursor-pointer" : ""}`}
+      style={{ width: `${size}px`, height: `${size}px` }}
+    />
+  );
+}

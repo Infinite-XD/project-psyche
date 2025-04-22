@@ -41,6 +41,7 @@ const Navigation = () => {
                   className="nav-active-indicator"
                   layoutId="activeIndicator"
                   transition={{ duration: 0.3 }}
+                  style={{ transform: "none" }} 
                 />
               )}
             </div>
