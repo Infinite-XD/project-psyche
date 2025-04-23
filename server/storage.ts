@@ -1,39 +1,40 @@
-import { users, type User, type InsertUser } from "@shared/schema";
+import { db } from './db';
+import { users, sessions } from './db/schema';
+import { eq } from 'drizzle-orm';
 
-// modify the interface with any CRUD methods
-// you might need
+export const storage = {
+  // User operations
+  async getUserById(id: number) {
+    return db.query.users.findFirst({
+      where: eq(users.id, id)
+    });
+  },
+  
+  async getUserByUsername(username: string) {
+    return db.query.users.findFirst({
+      where: eq(users.username, username)
+    });
+  },
+  
+  async getUserByEmail(email: string) {
+    return db.query.users.findFirst({
+      where: eq(users.email, email)
+    });
+  },
+  
+  // Session operations
+  async getSession(token: string) {
+    return db.query.sessions.findFirst({
+      where: eq(sessions.token, token)
+    });
+  },
+  
+  async invalidateSession(token: string) {
+    return db
+      .update(sessions)
+      .set({ isRevoked: true })
+      .where(eq(sessions.token, token));
+  },
 
-export interface IStorage {
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-}
-
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  currentId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.currentId = 1;
-  }
-
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
-  }
-}
-
-export const storage = new MemStorage();
+  // Other operations can be added as needed
+};
