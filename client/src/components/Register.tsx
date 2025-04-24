@@ -45,7 +45,7 @@ const Register: React.FC = () => {
         </div>
       </div>
 
-      <div className="w-full max-w-md relative">
+      <div className="w-full max-w-sm relative">
         {/* Card glow effects */}
         <div className="absolute inset-0 rounded-3xl opacity-20 blur-xl -z-10" 
              style={{background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2), transparent 70%)'}}></div>
@@ -53,7 +53,7 @@ const Register: React.FC = () => {
              style={{background: 'linear-gradient(45deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.1) 100%)'}}></div>
         
         {/* Main card */}
-        <div className="bg-black backdrop-blur-xl rounded-3xl p-6 sm:p-10 space-y-6 sm:space-y-8 shadow-2xl border border-gray-900 relative overflow-hidden">
+        <div className="bg-black backdrop-blur-xl rounded-3xl p-8 sm:p-10 space-y-6 sm:space-y-8 shadow-2xl border border-gray-900 relative overflow-hidden">
           {/* Abstract geometric accents */}
           <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full opacity-20"
                style={{background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0) 70%)'}}>

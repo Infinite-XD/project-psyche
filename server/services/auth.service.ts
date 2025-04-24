@@ -168,6 +168,49 @@ export class AuthService {
       isRevoked: false,
     });
   }
+
+  /** Change the current user’s password */
+  async changePassword(userId: number, oldPassword: string, newPassword: string) {
+    // 1) Fetch the user’s record
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId)
+    });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // 2) Verify the old password
+    const isValid = await bcrypt.compare(oldPassword, user.passwordHash);
+    if (!isValid) {
+      throw new Error('Current password is incorrect');
+    }
+
+    // 3) Hash the new password
+    const newHash = await bcrypt.hash(newPassword, 10);
+
+    // 4) Update the database
+    await db.update(users)
+      .set({ passwordHash: newHash })
+      .where(eq(users.id, userId));
+  }
+
+  /** Permanently delete the user’s account and any related data */
+  async deleteAccount(userId: number) {
+    // 1) Delete all sessions for this user
+    console.log(`Deleting sessions for user ${userId}`);
+    await db
+      .delete(sessions)
+      .where(eq(sessions.userId, userId));
+
+    // 2) (Optional) delete other related data here…
+
+    // 3) Finally delete the user record
+    console.log(`Deleting user ${userId}`);
+    await db
+      .delete(users)
+      .where(eq(users.id, userId));
+  }
+
 }
 
 export const authService = new AuthService();

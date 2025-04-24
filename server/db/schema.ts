@@ -20,6 +20,7 @@ export const sessions = pgTable('sessions', {
   isRevoked: boolean('is_revoked').default(false).notNull(),
 });
 
+
 // Define types based on the schema
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;

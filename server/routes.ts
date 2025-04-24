@@ -103,6 +103,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+app.post(
+  '/api/change-password',
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const { oldPassword, newPassword } = req.body;
+      if (!oldPassword || !newPassword) {
+        return res.status(400).json({ message: 'Both old and new passwords are required' });
+      }
+      await authService.changePassword(userId, oldPassword, newPassword);
+      return res.status(200).json({ message: 'Password changed successfully' });
+    } catch (err: any) {
+      return res.status(400).json({ message: err.message });
+    }
+  }
+);
+
+// Delete account endpoint
+app.delete(
+  '/api/delete-account',
+  authMiddleware,
+  async (req, res) => {
+    const userId = req.user!.id;
+    console.log(`→ [Route] Received delete-account for user ${userId}`);
+    try {
+      await authService.deleteAccount(userId);
+      console.log(`→ [Route] deleteAccount succeeded for user ${userId}`);
+      res.clearCookie('auth_token');
+      return res.status(200).json({ message: 'Account deleted successfully' });
+    } catch (err: any) {
+      console.error(`→ [Route] deleteAccount FAILED for user ${userId}:`, err);
+      return res.status(400).json({ message: err.message });
+    }
+  }
+);
+
+
   const httpServer = createServer(app);
   return httpServer;
 }

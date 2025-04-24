@@ -8,6 +8,7 @@ import Register from './components/Register';
 import HomePage from './pages/homepage';
 import ChatPage from './pages/chatbot';
 import SettingsPage from './pages/settings';
+import { AnimatePresence, motion } from 'framer-motion';
 
 // Hook to set --primary on root according to current path
 const useThemeByPath = () => {
@@ -58,20 +59,51 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return isAuthenticated ? <Navigate to="/" /> : <>{children}</>;
 };
 
-const AppContent: React.FC = () => {
-  useThemeByPath();
+const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.05 }}
+    className="min-h-screen"
+  >
+    {children}
+  </motion.div>
+);
+
+const AnimatedRoutes: React.FC = () => {
+  const location = useLocation();
+  useThemeByPath(); // still works here
+
   const { loading } = useAuth();
   if (loading) return <FullScreenSpinner />;
 
   return (
-    <Routes>
-      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-      <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-      <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
-      <Route path="/chat" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
-      <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route
+          path="/login"
+          element={<PublicRoute><PageWrapper><Login /></PageWrapper></PublicRoute>}
+        />
+        <Route
+          path="/register"
+          element={<PublicRoute><PageWrapper><Register /></PageWrapper></PublicRoute>}
+        />
+        <Route
+          path="/"
+          element={<PrivateRoute><PageWrapper><HomePage /></PageWrapper></PrivateRoute>}
+        />
+        <Route
+          path="/chat"
+          element={<PrivateRoute><PageWrapper><ChatPage /></PageWrapper></PrivateRoute>}
+        />
+        <Route
+          path="/settings"
+          element={<PrivateRoute><PageWrapper><SettingsPage /></PageWrapper></PrivateRoute>}
+        />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </AnimatePresence>
   );
 };
 
@@ -79,8 +111,7 @@ const App: React.FC = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <Router>
-        {/* Remove hardcoded wrappers; let each page component handle its own background */}
-        <AppContent />
+        <AnimatedRoutes />
       </Router>
     </AuthProvider>
   </QueryClientProvider>

@@ -1,81 +1,53 @@
+// settings.tsx
+
 import { useEffect, useState } from "react";
-import Navigation from "../components/Navigation";
 import { useNavigate } from "react-router-dom";
+import Navigation from "../components/Navigation";
+import MascotIcon from '../components/MascotIcon';
 import "../styles/globals.css";
+import { useAuth } from '../context/AuthContext';
 
 const SettingsPage = () => {
-  const [email, setEmail] = useState("");
+  const { logout } = useAuth();
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchCurrentUser();
+    setIsMounted(true);
   }, []);
-
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await fetch("/api/me", {
-        credentials: "include",
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setEmail(data.email);
-      }
-    } catch (err) {
-      setError("Failed to fetch user data");
-    }
-  };
-
-  const handleEmailUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("/api/update-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        setSuccess("Email updated successfully");
-      } else {
-        setError("Failed to update email");
-      }
-    } catch (err) {
-      setError("Error updating email");
-    }
-  };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
     try {
       const response = await fetch("/api/change-password", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ oldPassword, newPassword }),
         credentials: "include",
       });
 
+      const data = await response.json();
       if (response.ok) {
-        setSuccess("Password changed successfully");
+        setSuccess(data.message || "Password changed successfully");
         setOldPassword("");
         setNewPassword("");
       } else {
-        setError("Failed to change password");
+        setError(data.message || "Failed to change password");
       }
-    } catch (err) {
-      setError("Error changing password");
+    } catch (err: any) {
+      console.error("Error changing password", err);
+      setError(err.message || "Error changing password");
     }
   };
 
   const handleDeleteAccount = async () => {
+    setError("");
     if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
       try {
         const response = await fetch("/api/delete-account", {
@@ -84,84 +56,207 @@ const SettingsPage = () => {
         });
 
         if (response.ok) {
-          handleLogout();
+          // After deletion, log the user out and redirect
+          await logout();
+          navigate("/login", { replace: true });
         } else {
-          setError("Failed to delete account");
+          const err = await response.json();
+          setError(err.message || "Failed to delete account");
         }
-      } catch (err) {
+      } catch {
         setError("Error deleting account");
       }
     }
   };
 
-  const handleLogout = () => {
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    navigate("/login");
+  const handleLogout = async () => {
+    setError("");
+    try {
+      await logout();
+      navigate("/login", { replace: true });
+    } catch (err) {
+      console.error("Logout failed", err);
+      setError("Failed to logout. Please try again.");
+    }
   };
 
+  if (!isMounted) return null;
+
   return (
-    <div className="app-container">
-      <div className="app-content">
-        <h1 className="app-title">Settings</h1>
+<div className="min-h-screen flex flex-col items-center p-5" style={{ background: 'linear-gradient(135deg, #070707 0%, #141414 100%)' }}>
+  {/* Animated background elements - true black theme */}
+  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="absolute top-0 left-0 w-full h-full opacity-20">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(168, 48, 48, 0) 70%)',
+            width: `${Math.random() * 300 + 100}px`,
+            height: `${Math.random() * 300 + 100}px`,
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            filter: 'blur(40px)',
+            opacity: Math.random() * 0.3 + 0.1,
+            transform: 'translate(-50%, -50%)',
+            animation: `floatEffect ${Math.random() * 10 + 20}s infinite ease-in-out`
+          }}
+        />
+      ))}
+    </div>
+  </div>
 
-        <div className="max-w-md mx-auto space-y-6">
-          {/* Email Update Form */}
-          <form onSubmit={handleEmailUpdate} className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Update Email</h2>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 mb-4 border rounded"
-              required
-            />
-            <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-              Update Email
-            </button>
-          </form>
+      <div className="w-full max-w-[500px] flex flex-col items-center mt-6 mb-6">
+        <h1 className="text-3xl font-extrabold mb-6"
+            style={{
+              background: 'linear-gradient(to right, #ffffff, #cccccc)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}>
+          Settings
+        </h1>
 
-          {/* Password Change Form */}
-          <form onSubmit={handlePasswordChange} className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Change Password</h2>
-            <input
-              type="password"
-              value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
-              placeholder="Current Password"
-              className="w-full p-2 mb-4 border rounded"
-              required
-            />
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="New Password"
-              className="w-full p-2 mb-4 border rounded"
-              required
-            />
-            <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-              Change Password
-            </button>
-          </form>
+        <div className="w-full relative">
+          {/* Card glow effects - enhanced for true black theme */}
+          <div className="absolute inset-0 rounded-2xl opacity-20 blur-xl -z-10" 
+               style={{background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2), transparent 70%)'}}></div>
+          <div className="absolute inset-0 rounded-2xl -z-10 animate-pulse-slow"
+               style={{background: 'linear-gradient(45deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.1) 100%)'}}></div>
+          
+          {/* Main card */}
+          <div className="bg-black backdrop-blur-xl rounded-2xl p-5 space-y-5 shadow-2xl border border-gray-900 relative overflow-hidden">
+            {/* Modern neon effect line */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent via-accent/20 to-black"></div>
+            
+            {error && (
+              <div className="text-red-300 bg-red-900/20 px-3 py-2.5 rounded-lg border border-red-800/40 flex items-center space-x-2.5 mb-1">
+                <svg className="w-4 h-4 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
 
-          {/* Account Deletion */}
-          <div className="bg-red-50 p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4 text-red-600">Danger Zone</h2>
-            <button
-              onClick={handleDeleteAccount}
-              className="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600"
-            >
-              Delete Account
-            </button>
+            {success && (
+              <div className="text-green-300 bg-green-900/20 px-3 py-2.5 rounded-lg border border-green-800/40 flex items-center space-x-2.5 mb-1">
+                <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-sm">{success}</span>
+              </div>
+            )}
+
+            <div className="space-y-6">
+              {/* Password Change Form */}
+              <form onSubmit={handlePasswordChange} className="space-y-5">
+                <div className="space-y-1.5">
+                  <h3 className="text-white text-lg font-semibold">Change Password</h3>
+                  <div className="h-px bg-gradient-to-r from-black via-accent/30 to-black"></div>
+                </div>
+                
+                <div className="group space-y-3">
+                  <div>
+                    <label htmlFor="oldPassword" className="block text-xs text-gray-500 mb-1.5 pl-1">Current Password</label>
+                    <div className="relative">
+                      <input
+                        id="oldPassword"
+                        type="password"
+                        value={oldPassword}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                        required
+                        className="w-full pl-10 pr-3 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition duration-300 group-hover:border-gray-700 z-10 relative"
+                        style={{ color: '#ffffff', backgroundColor: '#111111' }}
+                      />
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-hover:text-accent transition-colors duration-300 z-20">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                      </div>
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-accent/50 to-accent/0 opacity-0 group-hover:opacity-30 rounded-lg blur-sm transition duration-300 -z-10"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="newPassword" className="block text-xs text-gray-500 mb-1.5 pl-1">New Password</label>
+                    <div className="relative">
+                      <input
+                        id="newPassword"
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                        className="w-full pl-10 pr-3 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition duration-300 group-hover:border-gray-700 z-10 relative"
+                        style={{ color: '#ffffff', backgroundColor: '#111111' }}
+                      />
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-hover:text-accent transition-colors duration-300 z-20">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                        </svg>
+                      </div>
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-accent/50 to-accent/0 opacity-0 group-hover:opacity-30 rounded-lg blur-sm transition duration-300 -z-10"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3 mt-2 relative text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center space-x-2 overflow-hidden group"
+                  style={{
+                    background: 'linear-gradient(45deg, rgba(60,60,60,1) 0%, rgba(20,20,20,1) 100%)'
+                  }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-accent via-accent/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <span className="relative z-10">Change Password</span>
+                </button>
+              </form>
+
+              {/* Danger Zone */}
+              <div className="space-y-4 pt-2">
+                <div className="space-y-1.5">
+                  <h3 className="text-red-400 text-lg font-semibold">Danger Zone</h3>
+                  <div className="h-px bg-gradient-to-r from-black via-red-500/30 to-black"></div>
+                </div>
+                
+                <button
+                  onClick={handleDeleteAccount}
+                  className="w-full py-3 relative text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center space-x-2 overflow-hidden group"
+                  style={{
+                    background: 'linear-gradient(45deg, rgba(90,30,30,1) 0%, rgba(40,10,10,1) 100%)'
+                  }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-500 via-red-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <svg className="w-4 h-4 mr-2 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span className="relative z-10">Deete Account</span>
+                </button>
+
+                {/* Mascot Icon – smaller and centered above logout */}
+                <div className="flex justify-center pt-3 pb-2">
+                  <div className="animate-bounce-slow scale-75">
+                    <MascotIcon />
+                  </div>
+                </div>
+
+                {/* Logout Button */}
+                <button
+                  onClick={handleLogout}
+                  className="w-full py-3 relative font-medium rounded-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center space-x-2 overflow-hidden group bg-transparent border border-gray-800"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-accent/30 via-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <svg className="w-4 h-4 mr-2 text-gray-400 group-hover:text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span className="text-gray-400 group-hover:text-white relative z-10">Logout</span>
+                </button>
+              </div>
+            </div>
           </div>
-
-          {/* Error/Success Messages */}
-          {error && <div className="text-red-500 p-4 bg-red-50 rounded-lg">{error}</div>}
-          {success && <div className="text-green-500 p-4 bg-green-50 rounded-lg">{success}</div>}
         </div>
-
-        <Navigation />
       </div>
+        
+      <Navigation />
     </div>
   );
 };
