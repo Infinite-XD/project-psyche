@@ -16,25 +16,19 @@ declare global {
 
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
   try {
-    // Get token from Authorization header
+    // 1) Try cookie first…
+    const cookieToken = req.cookies?.auth_token;
+    // 2) …then fall back to Authorization header
     const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ message: 'Authentication required' });
-    }
-    
-    const token = authHeader.split(' ')[1];
-    
+    const bearerToken = authHeader?.startsWith('Bearer ') && authHeader.split(' ')[1];
+    const token = cookieToken || bearerToken;
+
     if (!token) {
       return res.status(401).json({ message: 'Authentication required' });
     }
-    
-    // Verify token
+
     const user = await authService.verifyToken(token);
-    
-    // Attach user to request
     req.user = user;
-    
     next();
   } catch (error) {
     return res.status(401).json({ message: 'Invalid or expired token' });

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   User, 
@@ -8,14 +8,15 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { name: "My Profile", icon: <User size={20} /> },
-  { name: "Mood Analysis", icon: <BarChart size={20} /> },
-  { name: "Chat", icon: <MessageCircle size={20} /> },
-  { name: "Settings", icon: <Settings size={20} /> }
+  { name: "My Profile", icon: <User size={20} />, path: "/" },
+  { name: "Mood Analysis", icon: <BarChart size={20} />, path: "/mood-tracking" },
+  { name: "Chat", icon: <MessageCircle size={20} />, path: "/chatbot" },
+  { name: "Settings", icon: <Settings size={20} />, path: "/settings" }
 ];
 
 const Navigation = () => {
-  const [activeTab, setActiveTab] = useState("My Profile");
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   return (
     <motion.nav 
@@ -28,24 +29,35 @@ const Navigation = () => {
         {navItems.map((item) => (
           <motion.div
             key={item.name}
-            className={`nav-item ${activeTab === item.name ? 'active' : ''}`}
-            onClick={() => setActiveTab(item.name)}
+            className={`nav-item ${currentPath === item.path ? 'active' : ''}`}
             whileHover={{ y: -5 }}
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="nav-icon">
-              {item.icon}
-              {activeTab === item.name && (
-                <motion.div 
-                  className="nav-active-indicator"
-                  layoutId="activeIndicator"
-                  transition={{ duration: 0.3 }}
-                  style={{ transform: "none" }} 
-                />
-              )}
-            </div>
-            <span className="nav-label">{item.name}</span>
+            <Link 
+              to={item.path}
+              style={{
+                textDecoration: 'none',
+                color: 'inherit',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 4
+              }}
+            >
+              <div className="nav-icon">
+                {item.icon}
+                {currentPath === item.path && (
+                  <motion.div 
+                    className="nav-active-indicator"
+                    layoutId="activeIndicator"
+                    transition={{ duration: 0.3 }}
+                    style={{ transform: "none" }} 
+                  />
+                )}
+              </div>
+              <span className="nav-label">{item.name}</span>
+            </Link>
           </motion.div>
         ))}
       </div>
@@ -54,3 +66,61 @@ const Navigation = () => {
 };
 
 export default Navigation;
+
+
+// import { useState } from "react";
+// import { motion } from "framer-motion";
+// import { 
+//   User, 
+//   Settings, 
+//   BarChart,
+//   MessageCircle
+// } from "lucide-react";
+
+// const navItems = [
+//   { name: "My Profile", icon: <User size={20} /> },
+//   { name: "Mood Analysis", icon: <BarChart size={20} /> },
+//   { name: "Chat", icon: <MessageCircle size={20} /> },
+//   { name: "Settings", icon: <Settings size={20} /> }
+// ];
+
+// const Navigation = () => {
+//   const [activeTab, setActiveTab] = useState("My Profile");
+
+//   return (
+//     <motion.nav 
+//       className="navigation"
+//       initial={{ opacity: 0, y: 50 }}
+//       animate={{ opacity: 1, y: 0 }}
+//       transition={{ duration: 0.5, delay: 0.3 }}
+//     >
+//       <div className="nav-container">
+//         {navItems.map((item) => (
+//           <motion.div
+//             key={item.name}
+//             className={`nav-item ${activeTab === item.name ? 'active' : ''}`}
+//             onClick={() => setActiveTab(item.name)}
+//             whileHover={{ y: -5 }}
+//             whileTap={{ scale: 0.95 }}
+//             transition={{ duration: 0.2 }}
+//           >
+//             <div className="nav-icon">
+//               {item.icon}
+//               {activeTab === item.name && (
+//                 <motion.div 
+//                   className="nav-active-indicator"
+//                   layoutId="activeIndicator"
+//                   transition={{ duration: 0.3 }}
+//                   style={{ transform: "none" }} 
+//                 />
+//               )}
+//             </div>
+//             <span className="nav-label">{item.name}</span>
+//           </motion.div>
+//         ))}
+//       </div>
+//     </motion.nav>
+//   );
+// };
+
+// export default Navigation;

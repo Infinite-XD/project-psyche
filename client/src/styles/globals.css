@@ -1,9 +1,21 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* :root {
+  --primary: #121212;
+  --secondary: #2A2A2A;
+  --accent: rgba(255, 255, 255, 0.8);
+  --interactive: #8A8A8A;
+  --highlight: #E0E0E0;
+  --transition-ease: all 0.3s ease;
+  --blur-effect: 8px;
+  --border-radius: 12px;
+} */
+
 
 :root {
-  --primary: #121212;
+  --primary: #cb1b1b;
   --secondary: #2A2A2A;
   --accent: rgba(255, 255, 255, 0.8);
   --interactive: #8A8A8A;
@@ -13,7 +25,25 @@
   --border-radius: 12px;
 }
 
+
+@layer utilities {
+  .primary-bg {
+    background-color: hsl(var(--primary)) !important;
+  }
+}
+
+
+@layer base {
+  body {
+    @apply bg-[#121212] text-white;
+    font-family: "SF Pro Display", "Inter", sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+  }
+
 body {
+  background: #121212;
   font-family: "SF Pro Display", "Inter", sans-serif;
   background-color: var(--primary);
   margin: 0;
@@ -261,6 +291,25 @@ body {
   font-weight: 500;
 }
 
+
+@keyframes floatEffect {
+  0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+  25% { transform: translate(-45%, -55%) rotate(5deg); }
+  50% { transform: translate(-55%, -45%) rotate(-5deg); }
+  75% { transform: translate(-45%, -45%) rotate(3deg); }
+}
+.animate-bounce-slow {
+  animation: bounce 3s infinite ease-in-out;
+}
+.animate-pulse-slow {
+  animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+
 /* Media Queries */
 @media (max-width: 768px) {
   .app-content {
@@ -287,4 +336,5 @@ body {
   .nav-label {
     font-size: 0.7rem;
   }
+}
 }
