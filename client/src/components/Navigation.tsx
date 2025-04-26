@@ -10,7 +10,7 @@ import {
 const navItems = [
   { name: "My Profile", icon: <User size={20} />, path: "/" },
   { name: "Mood Analysis", icon: <BarChart size={20} />, path: "/mood-tracking" },
-  { name: "Chat", icon: <MessageCircle size={20} />, path: "/chatbot" },
+  { name: "Chat", icon: <MessageCircle size={20} />, path: "/chat" },
   { name: "Settings", icon: <Settings size={20} />, path: "/settings" }
 ];
 

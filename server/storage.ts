@@ -2,6 +2,13 @@ import { db } from './db';
 import { users, sessions } from './db/schema';
 import { eq } from 'drizzle-orm';
 
+export interface ChatMessage {
+  sender: 'user' | 'bot';
+  text: string;
+  timestamp: string;
+}
+
+
 export const storage = {
   // User operations
   async getUserById(id: number) {
@@ -37,4 +44,8 @@ export const storage = {
   },
 
   // Other operations can be added as needed
+
+  chatLogs: new Map<number, ChatMessage[]>(),
+
+  lastSeen: new Map<number, number>(),
 };

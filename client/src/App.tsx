@@ -6,7 +6,7 @@ import { queryClient } from './lib/queryClient';
 import Login from './components/Login';
 import Register from './components/Register';
 import HomePage from './pages/homepage';
-import ChatPage from './pages/chatbot';
+import ChatPage from './components/chatbot';
 import SettingsPage from './pages/settings';
 import { AnimatePresence, motion } from 'framer-motion';
 

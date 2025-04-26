@@ -1,13 +1,21 @@
-import type { Express } from "express";
+import express, { type Express } from 'express';
 import { createServer, type Server } from "http";
 import { authService } from "./services/auth.service";
 import { authMiddleware, optionalAuthMiddleware } from "./middleware/auth.middleware";
-import { storage } from "./storage";
+import { storage, ChatMessage } from "./storage";
 import cookieParser from "cookie-parser";
+import { 
+  GoogleGenerativeAI,
+  HarmCategory,
+  HarmBlockThreshold
+} from '@google/generative-ai';
+
+
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Add cookie parser middleware
   app.use(cookieParser());
+  app.use(express.json());
 
   // Auth routes
   app.post('/api/auth/register', async (req, res) => {
@@ -62,25 +70,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post('/api/auth/logout', async (req, res) => {
+  app.post('/api/auth/logout', authMiddleware, async (req, res) => {
     try {
-      const token = req.cookies.auth_token || 
-                   (req.headers.authorization?.startsWith('Bearer ') 
-                     ? req.headers.authorization.split(' ')[1] 
-                     : null);
-      
+      const token = req.cookies.auth_token
+        ?? (req.headers.authorization?.startsWith('Bearer ')
+            ? req.headers.authorization.split(' ')[1]
+            : null);
+  
       if (token) {
         await authService.logout(token);
       }
-      
-      // Clear the cookie
+  
+      // NOW we have req.user
+      const userId = req.user!.id;
+      storage.chatLogs.delete(userId);
+      storage.lastSeen.delete(userId);
+  
       res.clearCookie('auth_token');
-      
       return res.status(200).json({ message: 'Logged out successfully' });
-    } catch (error) {
+    } catch (err) {
       return res.status(500).json({ message: 'Failed to logout' });
     }
   });
+  
   
   // Protected route example
   app.get('/api/profile', authMiddleware, async (req, res) => {
@@ -140,6 +152,73 @@ app.delete(
   }
 );
 
+    // --- Gemini setup ---
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-flash',
+    generationConfig: {
+      temperature: 0.9,
+      topP: 1,
+      topK: 1,
+      maxOutputTokens: 2048,
+    },
+    safetySettings: [
+      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+    ],
+  });
+
+  // Chat history
+  app.get('/api/chat/history', authMiddleware, (req, res) => {
+    const userId = req.user!.id;
+    const history = storage.chatLogs.get(userId) || [];
+    return res.json({ history });
+  });
+
+  // Chat message → Gemini
+  app.post('/api/chat/message', authMiddleware, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const text = req.body.text;
+      if (!text || typeof text !== 'string') {
+        return res.status(400).json({ message: 'Message text is required' });
+      }
+
+      // Append user message
+      const now = new Date().toISOString();
+      const logs = storage.chatLogs.get(userId) || [];
+      logs.push({ sender: 'user', text, timestamp: now });
+
+      // Build prompt
+      const prompt = [
+        'You are a helpful academic stress management chatbot. Follow these rules:',
+        '- Respond conversationally',
+        '- Offer practical advice',
+        '- Be empathetic and supportive',
+        '- Keep responses under 500 characters',
+        'Current conversation:',
+        ...logs.map(m => `${m.sender}: ${m.text}`)
+      ].join('\n');
+
+      // *** FIX: pass an array, then call .response.text() ***
+      const result = await model.generateContent([ prompt ]);
+      const botText = result.response.text();
+
+      // Save and return bot message
+      const botMsg: ChatMessage = { sender: 'bot', text: botText, timestamp: new Date().toISOString() };
+      logs.push(botMsg);
+      storage.chatLogs.set(userId, logs);
+
+      return res.json({ reply: botMsg });
+    } catch (error: any) {
+      console.error('Chat message error:', error);
+      return res.status(500).json({ message: 'Failed to process chat message' });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
