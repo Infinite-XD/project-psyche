@@ -1,3 +1,6 @@
+// MoodSlider.tsx
+// useless
+
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
@@ -14,8 +17,8 @@ const MoodSlider = ({ value, onChange }: MoodSliderProps) => {
     if (value <= 20) return "#FF5C5C"; // terrible - red
     if (value <= 40) return "#FF9E5C"; // bad - orange
     if (value <= 60) return "#FFDD5C"; // neutral - yellow
-    if (value <= 80) return "#5CFF9E"; // good - green
-    return "#5C9EFF";                   // great - blue
+    if (value <= 80) return "#5C9EFF"; // good - green
+    return "#5CFF9E";               // great - blue
   };
   
   // Get background gradient based on mood

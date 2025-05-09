@@ -121,12 +121,12 @@ export default function ChatPage() {
                style={{background: 'linear-gradient(45deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.1) 100%)'}}></div>
           
           {/* Main card */}
-          <div className="bg-black backdrop-blur-xl rounded-2xl p-5 space-y-5 shadow-2xl border border-gray-900 relative overflow-hidden">
+          <div className="bg-black backdrop-blur-xl rounded-2xl p-5 shadow-2xl border border-gray-900 relative overflow-hidden min-h-[650px]">
             {/* Modern neon effect line */}
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent via-accent/20 to-black"></div>
             
             {/* Messages container */}
-            <div className="h-[400px] overflow-y-auto px-1 space-y-4 custom-scrollbar">
+            <div className="h-[calc(100%-140px)] overflow-y-auto px-1 space-y-4 custom-scrollbar">
               {messages.length === 0 && (
                 <div className="flex flex-col items-center justify-center h-full opacity-60">
                   {/* Mascot Icon */}
@@ -165,6 +165,7 @@ export default function ChatPage() {
             </div>
             
             {/* Input area */}
+            <div className="absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black/80 to-transparent">
             <div className="h-px bg-gradient-to-r from-black via-accent/30 to-black mb-2"></div>
             <form onSubmit={handleSubmit} className="flex space-x-2">
               <div className="relative flex-1 group">
@@ -204,6 +205,7 @@ export default function ChatPage() {
             </form>
           </div>
         </div>
+      </div>
       </div>
         
       <Navigation />

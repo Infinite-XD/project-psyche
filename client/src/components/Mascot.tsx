@@ -1,3 +1,5 @@
+// Mascot.tsx
+
 import { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import { useMood } from "../lib/stores/useMood";
@@ -40,25 +42,29 @@ const Mascot = ({ size = 450, showChat = false }: MascotProps) => {
     let sphereColor = new THREE.Color(0x6495ed);
     let emissiveColor = new THREE.Color(0x4169e1);
     switch (showChat ? "calm" : currentMood) {
-      case "happy":
-        sphereColor.set(0xffd700);
-        emissiveColor.set(0xdaa520);
+      case "happy":  // great
+        sphereColor.set(0x5CFF9E);
+        emissiveColor.set(0x2FDFA0); // darker mint
         break;
-      case "calm":
-        sphereColor.set(0x6495ed);
-        emissiveColor.set(0x4169e1);
+    
+      case "calm":   // good
+        sphereColor.set(0x5C9EFF);
+        emissiveColor.set(0x2C7EFF); // deeper sky
         break;
+    
       case "neutral":
-        sphereColor.set(0x808080);
-        emissiveColor.set(0x8a8a8a);
+        sphereColor.set(0xFFDD5C);
+        emissiveColor.set(0xCCA842); // muted gold
         break;
-      case "sad":
-        sphereColor.set(0x7b68ee);
-        emissiveColor.set(0x6354cb);
+    
+      case "sad":    // bad
+        sphereColor.set(0xFF9E5C);
+        emissiveColor.set(0xCC7A47); // rusty orange
         break;
-      case "angry":
-        sphereColor.set(0xff6347);
-        emissiveColor.set(0xe03420);
+    
+      case "angry":  // terrible
+        sphereColor.set(0xFF5C5C);
+        emissiveColor.set(0xCC3C3C); // dark red
         break;
     }
     const material = new THREE.MeshBasicMaterial({ color: sphereColor, wireframe: true });
