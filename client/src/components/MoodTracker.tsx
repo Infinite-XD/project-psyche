@@ -9,6 +9,24 @@ import { useMood } from "../lib/stores/useMood";
 const moodLabels = ["Terrible", "Bad", "Meh", "Good", "Great"];
 
 const MoodTracker: React.FC = () => {
+
+  const [width, setWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 0
+  );
+  useEffect(() => {
+    const onResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  const isMobile  = width < 640;
+  const isTablet  = width >= 640 && width < 1024;
+  const isDesktop = width >= 1024;
+
+  // now compute your bar limits
+  const BAR_MIN = 10;
+  const BAR_MAX = isDesktop ? 80 : isTablet ? 60 : 40;
+
+
   const { mood, setMood } = useMood();
   const [prompt, setPrompt] = useState("How are you feeling today?");
   const [showSaveConfirmation, setShowSaveConfirmation] = useState(false);
@@ -51,21 +69,36 @@ const MoodTracker: React.FC = () => {
              swap Math.random() keys for `bar-${i}` and
              ensure the slider below is typed properly */}
       <motion.div
-          className="bg-neutral-950 rounded-2xl overflow-hidden shadow-2xl border border-gray-800"
+          className="
+            bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800
+            flex flex-col
+            min-h-[400px]        /* mobile fallback */
+            md:min-h-[500px]     /* ≥768px */
+            lg:min-h-[600px]     /* ≥1024px */
+          "
           whileHover={{ y: -5 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
         >
           {/* Futuristic Header */}
-          <div className="relative h-32">
+          <div   className="
+            relative
+            h-32           /* mobile */
+            md:h-48        /* ≥768px */
+            lg:h-64        /* ≥1024px */
+          ">
             {/* Visualizer bars */}
             <div className="absolute inset-0 flex items-end justify-center space-x-1 px-8 opacity-30">
               {[...Array(20)].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="w-1 bg-gray-400"
+                  className="w-1        /* mobile */
+                            sm:w-2     /* ≥640px */
+                            md:w-3     /* ≥768px */
+                            lg:w-4     /* ≥1024px */
+                            bg-gray-400"
                   initial={{ height: 0 }}
                   animate={{ 
-                    height: Math.random() * 40 + 10,
+                    height: Math.random() * (BAR_MAX - BAR_MIN) + BAR_MIN,
                     backgroundColor: getMoodColor()
                   }}
                   transition={{
@@ -121,9 +154,14 @@ const MoodTracker: React.FC = () => {
           </div>
           
           {/* Main Content Section */}
-          <div className="p-6 bg-black">
+          <div  className="
+            p-4             /* mobile */
+            md:p-6          /* ≥768px */
+            lg:p-8          /* ≥1024px */
+            bg-black
+          ">
             {/* New Futuristic Slider */}
-            <div className="mb-8">
+            <div className="mb-6">
             <FuturisticSlider value={mood} onChange={setMood} color={getMoodColor()} />
             </div>
             
@@ -237,7 +275,13 @@ const FuturisticSlider: React.FC<FuturisticSliderProps> = ({ value, onChange, co
     <div className="py-4">
       <div
         ref={sliderRef}
-        className="relative h-12 touch-none cursor-pointer"
+           className="
+     relative
+     h-12           /* mobile */
+     md:h-16        /* ≥768px */
+     lg:h-20        /* ≥1024px */
+     touch-none cursor-pointer
+  "
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}

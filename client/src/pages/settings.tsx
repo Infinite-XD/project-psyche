@@ -8,6 +8,8 @@ import "../styles/globals.css";
 import { useAuth } from '../context/AuthContext';
 
 const SettingsPage = () => {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { logout } = useAuth();
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -19,6 +21,39 @@ const SettingsPage = () => {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  const confirmDeleteAccount = async () => {
+    setShowDeleteModal(false);
+    setError("");
+    try {
+      const response = await fetch("/api/delete-account", {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (response.ok) {
+        await logout();
+        navigate("/login", { replace: true });
+      } else {
+        const err = await response.json();
+        setError(err.message || "Failed to delete account");
+      }
+    } catch {
+      setError("Error deleting account");
+    }
+  };
+
+  const confirmLogout = async () => {
+    setShowLogoutModal(false);
+    setError("");
+    try {
+      await logout();
+      navigate("/login", { replace: true });
+    } catch (err: any) {
+      console.error("Logout failed", err);
+      setError("Failed to logout. Please try again.");
+    }
+  };
+
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -215,7 +250,7 @@ return (
                   </div>
                   
                   <button
-                    onClick={handleDeleteAccount}
+                    onClick={() => setShowDeleteModal(true)}
                     className="w-full py-3 relative text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center space-x-2 overflow-hidden group"
                     style={{
                       background: 'linear-gradient(45deg, rgba(90,30,30,1) 0%, rgba(40,10,10,1) 100%)'
@@ -237,7 +272,7 @@ return (
 
                   {/* Logout Button */}
                   <button
-                    onClick={handleLogout}
+                    onClick={() => setShowLogoutModal(true)}
                     className="w-full py-3 relative font-medium rounded-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center space-x-2 overflow-hidden group bg-transparent border border-gray-800"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-accent/30 via-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -252,6 +287,53 @@ return (
           </div>
         </div>
       </div>
+
+      {(showDeleteModal || showLogoutModal) && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bg-black border border-gray-800 rounded-xl shadow-xl max-w-sm w-full p-6 space-y-6">
+            <h2 className="text-xl font-semibold text-white">
+              {showDeleteModal
+                ? "Delete your account?"
+                : "Log out?"}
+            </h2>
+            <p className="text-gray-300">
+              {showDeleteModal
+                ? "This action is irreversible. Are you sure you want to delete your account and all your data?"
+                : "You’ll need to log in again to continue. Are you sure you want to log out?"}
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setShowLogoutModal(false);
+                }}
+                className="px-4 py-2 rounded-lg border border-gray-700 text-gray-300 hover:bg-gray-800 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={
+                  showDeleteModal
+                    ? confirmDeleteAccount
+                    : confirmLogout
+                }
+                className={
+                  `px-4 py-2 rounded-lg font-medium transition ` +
+                  (showDeleteModal
+                    ? "bg-red-600 hover:bg-red-700 text-white"
+                    : "bg-accent hover:bg-accent/80 text-white")
+                }
+              >
+                {showDeleteModal ? "Delete" : "Log out"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Fixed navigation */}
       <div className="fixed inset-x-0 bottom-0 bg-black">

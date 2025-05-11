@@ -11,10 +11,19 @@ const Login: React.FC = () => {
   const { login, loading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('👉 handleSubmit start');
     e.preventDefault();
     setError('');
-    try { await login(usernameOrEmail, password); }
-    catch (err) { setError(err instanceof Error ? err.message : 'Login failed'); }
+    try {
+      console.log('👉 about to call login()');
+      await login(usernameOrEmail, password);
+      console.log('👉 login() succeeded');
+    } catch (err) {
+      console.log('👉 login() threw:', err);
+      const msg = err instanceof Error ? err.message : 'Login failed';
+      console.log('👉 setting error state to:', msg);
+      setError(msg);
+    }
   };
 
   return (
