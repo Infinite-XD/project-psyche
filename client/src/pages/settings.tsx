@@ -108,14 +108,6 @@ const SettingsPage = () => {
   </div>
 
       <div className="w-full max-w-[500px] flex flex-col items-center mt-6 mb-6">
-        <h1 className="text-3xl font-extrabold mb-6"
-            style={{
-              background: 'linear-gradient(to right, #ffffff, #cccccc)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}>
-          Settings
-        </h1>
 
         <div className="w-full relative">
           {/* Card glow effects - enhanced for true black theme */}

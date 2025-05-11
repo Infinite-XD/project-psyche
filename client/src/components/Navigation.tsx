@@ -1,3 +1,5 @@
+// Navigation.tsx
+
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, Settings, BarChart, MessageCircle } from "lucide-react";
@@ -19,7 +21,7 @@ const Navigation = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
     >
-      <div className="bg-black backdrop-blur-xl rounded-2xl p-5 shadow-2xl border border-gray-900 relative overflow-hidden">
+      <div className="bg-black backdrop-blur-xl p-3 shadow-2xl border border-gray-900 relative overflow-hidden">
         {/* Modern neon effect line */}
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent via-accent/20 to-black"></div>
         

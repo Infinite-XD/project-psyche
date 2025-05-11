@@ -10,7 +10,7 @@ interface MoodState {
 
 export const useMood = create<MoodState>()(
   subscribeWithSelector((set, get) => ({
-    mood: 50, // Default neutral mood
+    mood: 100, // Default neutral mood
     moodHistory: [],
     
     setMood: (value) => {

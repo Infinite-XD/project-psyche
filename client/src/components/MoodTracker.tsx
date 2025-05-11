@@ -40,7 +40,7 @@ const MoodTracker: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center bg-black p-4">
+    <div className="flex items-center justify-center bg-black p-4 m-0 rounded-2xl">
       <motion.div
         className="w-full"
         initial={{ opacity: 0, y: 20 }}
@@ -127,33 +127,40 @@ const MoodTracker: React.FC = () => {
             <FuturisticSlider value={mood} onChange={setMood} color={getMoodColor()} />
             </div>
             
-            {/* Prompt Card */}
-            <motion.div
-              className="bg-neutral-950 rounded-lg p-4 mb-6 border-l-2 border-r-2"
-              style={{ borderColor: getMoodColor() }}
-              key={prompt}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <p className="text-gray-300 text-sm">{prompt}</p>
-            </motion.div>
+          {/* Prompt Card */}
+          <motion.div
+            className="bg-neutral-950 rounded-lg p-4 mb-6 border"
+            style={{ 
+              borderColor: `${getMoodColor()}40` // Add hex alpha channel (80 = 50% opacity)
+            }}
+            key={prompt}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <p className="text-gray-300 text-sm">{prompt}</p>
+          </motion.div>
             
             {/* Save Button */}
             <div className="relative">
-              <motion.button
-                className="w-full py-3 px-4 rounded-lg font-medium text-white bg-neutral-950 border border-gray-800 relative overflow-hidden group"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.2 }}
-                onClick={handleSaveMood}
-              >
-                <div 
-                  className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
-                  style={{ background: getMoodColor() }}
-                />
-                <span>Save Mood</span>
-              </motion.button>
+            <motion.button
+              className="w-full py-3 px-4 rounded-lg font-medium text-white border border-gray-800 relative overflow-hidden group"
+              style={{ 
+                background: `linear-gradient(to right, ${getMoodColor()}40, ${getMoodColor()}20)`,
+              }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2 }}
+              onClick={handleSaveMood}
+            >
+              <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                style={{ 
+                  background: `linear-gradient(to right, ${getMoodColor()}80, ${getMoodColor()}40)`,
+                }}
+              />
+              <span>Save Mood</span>
+            </motion.button>
               
               {/* Save Confirmation */}
               <AnimatePresence>
