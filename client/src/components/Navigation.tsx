@@ -6,7 +6,7 @@ import { User, Settings, BarChart, MessageCircle } from "lucide-react";
 
 const navItems = [
   { name: "My Profile", icon: <User size={20} />, path: "/" },
-  { name: "Mood Analysis", icon: <BarChart size={20} />, path: "/mood-tracking" },
+  { name: "Mood Analysis", icon: <BarChart size={20} />, path: "/moodanalysis" },
   { name: "Chat", icon: <MessageCircle size={20} />, path: "/chat" },
   { name: "Settings", icon: <Settings size={20} />, path: "/settings" }
 ];

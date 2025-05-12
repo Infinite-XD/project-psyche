@@ -8,6 +8,7 @@ import Register from './components/Register';
 import HomePage from './pages/homepage';
 import ChatPage from './components/chatbot';
 import SettingsPage from './pages/settings';
+import MoodHistory from './pages/moodanalysis';
 import { AnimatePresence, motion } from 'framer-motion';
 
 // Hook to set --primary on root according to current path
@@ -100,6 +101,16 @@ const AnimatedRoutes: React.FC = () => {
         <Route
           path="/settings"
           element={<PrivateRoute><PageWrapper><SettingsPage /></PageWrapper></PrivateRoute>}
+        />
+        <Route
+          path="/moodanalysis"
+          element={
+            <PrivateRoute>
+              <PageWrapper>
+                <MoodHistory />
+              </PageWrapper>
+            </PrivateRoute>
+          }
         />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

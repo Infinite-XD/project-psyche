@@ -1,3 +1,5 @@
+// routes.ts
+
 import express, { type Express } from 'express';
 import { createServer, type Server } from "http";
 import { authService } from "./services/auth.service";
@@ -9,8 +11,9 @@ import {
   HarmCategory,
   HarmBlockThreshold
 } from '@google/generative-ai';
-
-
+import { db } from './db';                  // your Drizzle client
+import { moods } from './db/schema';
+import { eq } from 'drizzle-orm';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Add cookie parser middleware
@@ -151,6 +154,52 @@ app.delete(
     }
   }
 );
+
+
+// Save a new mood
+app.post(
+  '/api/moods',
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const { value } = req.body;
+      if (typeof value !== 'number' || value < 0 || value > 100) {
+        return res.status(400).json({ message: 'Invalid mood value' });
+      }
+      const [inserted] = await db
+        .insert(moods)
+        .values({ userId, value })
+        .returning();
+      return res.status(201).json({ mood: inserted });
+    } catch (err: any) {
+      console.error(err);
+      return res.status(500).json({ message: 'Could not save mood' });
+    }
+  }
+);
+
+// Fetch a user’s mood history
+app.get(
+  '/api/moods',
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const history = await db
+        .select()
+        .from(moods)
+        .where(eq(moods.userId, userId))     // ← use the eq() helper
+        .orderBy(moods.createdAt);           // you can also say .orderBy(moods.createdAt, 'asc')
+      return res.json({ history });
+    } catch (err: any) {
+      console.error(err);
+      return res.status(500).json({ message: 'Could not fetch moods' });
+    }
+  }
+);
+
+
 
     // --- Gemini setup ---
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);

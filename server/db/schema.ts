@@ -1,4 +1,6 @@
-import { pgTable, serial, text, timestamp, boolean } from 'drizzle-orm/pg-core';
+// schema.ts
+
+import { pgTable, serial, text, timestamp, boolean, integer } from 'drizzle-orm/pg-core';
 
 // Users table schema
 export const users = pgTable('users', {
@@ -20,8 +22,17 @@ export const sessions = pgTable('sessions', {
   isRevoked: boolean('is_revoked').default(false).notNull(),
 });
 
+export const moods = pgTable('moods', {
+  id:          serial('id').primaryKey(),
+  userId:      integer('user_id').notNull().references(() => users.id),
+  value:       integer('value').notNull(),                 // 0–100
+  createdAt:   timestamp('created_at').defaultNow().notNull(),
+});
 
-// Define types based on the schema
+// types
+export type MoodEntry   = typeof moods.$inferSelect;
+export type NewMoodEntry = typeof moods.$inferInsert;
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 

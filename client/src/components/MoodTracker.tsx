@@ -52,9 +52,23 @@ const MoodTracker: React.FC = () => {
     return "#5CFF9E";               // great - blue
   };
 
-  const handleSaveMood = () => {
-    setShowSaveConfirmation(true);
-    setTimeout(() => setShowSaveConfirmation(false), 2000);
+  const handleSaveMood = async () => {
+    try {
+      const res = await fetch('/api/moods', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ value: Math.round(mood) }),
+        // auth token is in HTTP‐only cookie, so no explicit header
+      });
+      if (!res.ok) throw new Error('Failed to save');
+      setShowSaveConfirmation(true);
+      setTimeout(() => setShowSaveConfirmation(false), 2000);
+    } catch (err) {
+      console.error(err);
+      // you might show an error toast here
+    }
   };
 
   return (
