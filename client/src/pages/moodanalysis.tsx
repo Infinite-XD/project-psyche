@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Navigation from "../components/Navigation";
 
 type MoodEntry = {
   id: number;
@@ -38,6 +39,11 @@ const MoodHistory: React.FC = () => {
           </li>
         ))}
       </ul>
+
+        {/* Navigation bar */}
+        <div className="fixed inset-x-0 bottom-0 bg-black">
+          <Navigation />
+        </div>
     </div>
   );
 };

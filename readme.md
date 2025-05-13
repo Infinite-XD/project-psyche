@@ -1,33 +1,56 @@
 # Project Psyche
 
-A full-stack TypeScript application built with React, Express, and PostgreSQL.
+A modern full-stack TypeScript application featuring an immersive 3D experience built with React Three Fiber, Express, and PostgreSQL.
 
-## Tech Stack
+## 🌟 Features
+
+- Immersive 3D graphics and animations using Three.js and React Three Fiber
+- Real-time physics simulations with Matter.js
+- Interactive UI components with Radix UI
+- Advanced animations with Framer Motion and GSAP
+- Secure authentication with Passport.js and JWT
+- Real-time capabilities with WebSocket
+- Responsive design with Tailwind CSS
+- Type-safe database operations with Drizzle ORM
+- Form validation with React Hook Form and Zod
+- State management with Zustand
+- Data visualization with Recharts
+- Interactive maps with React Leaflet
+- Sound effects with Howler.js
+
+## 🛠 Tech Stack
 
 ### Frontend
-- React 18
-- Vite
-- Tailwind CSS
-- Radix UI Components
-- Zustand (State Management)
-- React Router DOM
+- React 18 with TypeScript
+- Vite for fast development and building
+- Three.js & React Three Fiber for 3D graphics
+- Radix UI for accessible components
+- Tailwind CSS for styling
+- Framer Motion & GSAP for animations
+- Zustand for state management
+- React Router DOM for routing
 - React Hook Form with Zod validation
-- Three.js & React Three Fiber
-- Framer Motion & GSAP
+- WebSocket for real-time features
+- Various specialized libraries for enhanced functionality
 
 ### Backend
-- Express.js
+- Express.js with TypeScript
 - PostgreSQL with Drizzle ORM
-- Passport.js with JWT
-- Express Session
+- Passport.js with JWT authentication
+- Express Session for session management
+- WebSocket server for real-time features
+- Google AI integration
+- OpenAI integration
 
-## Prerequisites
+## 🚀 Getting Started
+
+### Prerequisites
 
 - Node.js (LTS version recommended)
 - PostgreSQL 14 or higher
 - npm or yarn package manager
 
-## Local Development Setup
+### Installation
 
 1. **Clone the repository**
    ```bash
@@ -70,11 +93,15 @@ A full-stack TypeScript application built with React, Express, and PostgreSQL.
    # Client URL (for CORS)
    CLIENT_URL=http://localhost:5173
 
-   # JWT Secret (generate a secure random string)
+   # JWT Secret
    JWT_SECRET=your_jwt_secret
 
-   # Session Secret (generate a secure random string)
+   # Session Secret
    SESSION_SECRET=your_session_secret
+
+   # AI API Keys (if using AI features)
+   GOOGLE_AI_API_KEY=your_google_ai_key
+   OPENAI_API_KEY=your_openai_key
    ```
 
 5. **Database Migrations**
@@ -91,9 +118,47 @@ The application will be available at:
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:5001
 
-## Production Deployment
+## 📦 Available Scripts
 
-### Server Requirements
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run check` - Type check
+- `npm run db:push` - Push database changes
+- `npm run db:generate` - Generate database migrations
+- `npm run db:migrate` - Run database migrations
+
+## 🏗 Project Structure
+
+```
+project-psyche/
+├── client/                 # Frontend application
+│   ├── src/               # Source files
+│   └── public/            # Static assets
+├── server/                # Backend application
+│   ├── config/           # Configuration files
+│   ├── db/               # Database related files
+│   ├── middleware/       # Express middleware
+│   ├── routes/           # API routes
+│   ├── services/         # Business logic
+│   ├── types/            # TypeScript types
+│   └── utils/            # Utility functions
+├── shared/               # Shared types and utilities
+└── docs/                # Documentation
+```
+
+## 🔒 Security
+
+- JWT-based authentication
+- Secure session management
+- CORS protection
+- Input validation with Zod
+- Environment variable protection
+- Database security best practices
+
+## 🚢 Deployment
+
+### Production Requirements
 - Node.js 18 or higher
 - PostgreSQL 14 or higher
 - Nginx (recommended for reverse proxy)
@@ -105,156 +170,24 @@ The application will be available at:
    npm run build
    ```
 
-2. **Environment Configuration**
-   Create a `.env` file with production values:
-   ```
-   # Database Configuration
-   DB_HOST=your_production_db_host
-   DB_PORT=5432
-   DB_USER=your_production_db_user
-   DB_PASSWORD=your_production_db_password
-   DB_NAME=your_production_db_name
+2. **Configure Environment**
+   Set up production environment variables in `.env`
 
-   # Client URL (your domain)
-   CLIENT_URL=https://your-domain.com
+3. **Database Setup**
+   - Create production database
+   - Run migrations
+   - Set up proper user permissions
 
-   # JWT Secret
-   JWT_SECRET=your_production_jwt_secret
-
-   # Session Secret
-   SESSION_SECRET=your_production_session_secret
-
-   # SSL Configuration (if using SSL)
-   SSL_KEY_PATH=/path/to/your/ssl/key
-   SSL_CERT_PATH=/path/to/your/ssl/cert
-   ```
-
-3. **Nginx Configuration**
-   Create a new Nginx configuration file:
-   ```nginx
-   server {
-       listen 80;
-       server_name your-domain.com;
-
-       # Redirect HTTP to HTTPS
-       return 301 https://$server_name$request_uri;
-   }
-
-   server {
-       listen 443 ssl;
-       server_name your-domain.com;
-
-       ssl_certificate /path/to/your/ssl/cert;
-       ssl_certificate_key /path/to/your/ssl/key;
-
-       # Frontend
-       location / {
-           root /path/to/your/dist;
-           try_files $uri $uri/ /index.html;
-       }
-
-       # Backend API
-       location /api {
-           proxy_pass http://localhost:5001;
-           proxy_http_version 1.1;
-           proxy_set_header Upgrade $http_upgrade;
-           proxy_set_header Connection 'upgrade';
-           proxy_set_header Host $host;
-           proxy_cache_bypass $http_upgrade;
-       }
-   }
-   ```
-
-4. **Start Production Server**
+4. **Process Management**
    ```bash
-   npm run start
+   # Install PM2
+   npm install -g pm2
+
+   # Start the application
+   pm2 start dist/index.js --name project-psyche
    ```
 
-### Process Management
-For production, it's recommended to use a process manager like PM2:
-```bash
-# Install PM2
-npm install -g pm2
-
-# Start the application
-pm2 start dist/index.js --name project-psyche
-
-# Other useful PM2 commands
-pm2 list            # List all processes
-pm2 logs            # View logs
-pm2 restart all     # Restart all processes
-pm2 stop all        # Stop all processes
-```
-
-## Database Management
-
-### Migrations
-```bash
-# Generate new migration
-npm run db:generate
-
-# Push changes to database
-npm run db:push
-
-# Run migrations
-npm run db:migrate
-```
-
-### Backup
-```bash
-# Backup database
-pg_dump -U your_username project_psyche > backup.sql
-
-# Restore database
-psql -U your_username project_psyche < backup.sql
-```
-
-## Security Considerations
-
-1. **Environment Variables**
-   - Never commit `.env` files
-   - Use strong, unique secrets for JWT and sessions
-   - Rotate secrets periodically
-
-2. **Database Security**
-   - Use strong passwords
-   - Limit database user permissions
-   - Enable SSL in production
-   - Regular backups
-
-3. **API Security**
-   - Enable CORS properly
-   - Use rate limiting
-   - Implement proper authentication
-   - Validate all inputs
-
-## Monitoring and Maintenance
-
-1. **Logs**
-   - Application logs are available in PM2
-   - Database logs in PostgreSQL
-   - Nginx access and error logs
-
-2. **Performance Monitoring**
-   - Use PM2 monitoring
-   - Database query optimization
-   - Regular maintenance tasks
-
-## Troubleshooting
-
-1. **Database Connection Issues**
-   - Verify PostgreSQL is running
-   - Check credentials in `.env`
-   - Ensure database exists
-   - Check SSL configuration
-
-2. **Application Issues**
-   - Check PM2 logs
-   - Verify environment variables
-   - Check file permissions
-   - Verify port availability
-
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -262,6 +195,12 @@ psql -U your_username project_psyche < backup.sql
 4. Push to the branch
 5. Create a Pull Request
 
-## License
+## 📝 License
 
 [Your License Here]
+
+## 🙏 Acknowledgments
+
+- Three.js community for 3D graphics support
+- Radix UI for accessible components
+- All other open-source contributors
