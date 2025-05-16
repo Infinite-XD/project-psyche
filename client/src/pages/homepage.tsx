@@ -5,7 +5,7 @@ import Mascot from "../components/Mascot";
 import "../styles/globals.css";
 
 
-const HIDE_DELAY_MS = 3000;
+const HIDE_DELAY_MS = 800;
 
 const HomePage = () => {
   // track the current window width

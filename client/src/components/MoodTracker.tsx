@@ -1,15 +1,12 @@
-// Moodtracker.tsx
+// MoodTracker.tsx
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMood } from "../lib/stores/useMood";
 
-
-
 const moodLabels = ["Terrible", "Bad", "Meh", "Good", "Great"];
 
 const MoodTracker: React.FC = () => {
-
   const [width, setWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 0
   );
@@ -18,14 +15,12 @@ const MoodTracker: React.FC = () => {
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
-  const isMobile  = width < 640;
-  const isTablet  = width >= 640 && width < 1024;
+  const isMobile = width < 640;
+  const isTablet = width >= 640 && width < 1024;
   const isDesktop = width >= 1024;
 
-  // now compute your bar limits
   const BAR_MIN = 10;
   const BAR_MAX = isDesktop ? 80 : isTablet ? 60 : 40;
-
 
   const { mood, setMood } = useMood();
   const [prompt, setPrompt] = useState("How are you feeling today?");
@@ -48,26 +43,23 @@ const MoodTracker: React.FC = () => {
     if (mood <= 20) return "#FF5C5C"; // terrible - red
     if (mood <= 40) return "#FF9E5C"; // bad - orange
     if (mood <= 60) return "#FFDD5C"; // neutral - yellow
-    if (mood <= 80) return "#5C9EFF"; // good - green
-    return "#5CFF9E";               // great - blue
+    if (mood <= 80) return "#5C9EFF"; // good - blue
+    return "#5CFF9E";               // great - teal
   };
 
   const handleSaveMood = async () => {
     try {
       const res = await fetch('/api/moods', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ value: Math.round(mood) }),
-        // auth token is in HTTP‐only cookie, so no explicit header
       });
       if (!res.ok) throw new Error('Failed to save');
       setShowSaveConfirmation(true);
       setTimeout(() => setShowSaveConfirmation(false), 2000);
     } catch (err) {
       console.error(err);
-      // you might show an error toast here
+      // show error toast if you’d like
     }
   };
 
@@ -79,39 +71,24 @@ const MoodTracker: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        {/* ... all your JSX stays largely the same, just
-             swap Math.random() keys for `bar-${i}` and
-             ensure the slider below is typed properly */}
-      <motion.div
+        <motion.div
           className="
             bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800
             flex flex-col
-            min-h-[400px]        /* mobile fallback */
-            md:min-h-[500px]     /* ≥768px */
-            lg:min-h-[600px]     /* ≥1024px */
+            min-h-[400px] md:min-h-[500px] lg:min-h-[600px]
           "
           whileHover={{ y: -5 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          {/* Futuristic Header */}
-          <div   className="
-            relative
-            h-32           /* mobile */
-            md:h-48        /* ≥768px */
-            lg:h-64        /* ≥1024px */
-          ">
-            {/* Visualizer bars */}
+          {/* Header + Visualizer */}
+          <div className="relative h-32 md:h-48 lg:h-64">
             <div className="absolute inset-0 flex items-end justify-center space-x-1 px-8 opacity-30">
               {[...Array(20)].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="w-1        /* mobile */
-                            sm:w-2     /* ≥640px */
-                            md:w-3     /* ≥768px */
-                            lg:w-4     /* ≥1024px */
-                            bg-gray-400"
+                  className="w-1 sm:w-2 md:w-3 lg:w-4 bg-gray-400"
                   initial={{ height: 0 }}
-                  animate={{ 
+                  animate={{
                     height: Math.random() * (BAR_MAX - BAR_MIN) + BAR_MIN,
                     backgroundColor: getMoodColor()
                   }}
@@ -124,10 +101,7 @@ const MoodTracker: React.FC = () => {
                 />
               ))}
             </div>
-            
-            {/* Overlay with glow */}
             <div className="absolute inset-0 bg-gradient-to-b from-black to-transparent opacity-80" />
-            
             <div className="relative flex flex-col h-full px-6 pt-6">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold text-white tracking-wider">MOOD TRACKER</h2>
@@ -135,16 +109,14 @@ const MoodTracker: React.FC = () => {
                   <div className="h-2 w-2 rounded-full" style={{ backgroundColor: getMoodColor() }} />
                 </div>
               </div>
-              
               <div className="mt-2 flex items-center">
-                <div 
+                <div
                   className="h-1 flex-grow"
-                  style={{ 
+                  style={{
                     background: `linear-gradient(90deg, ${getMoodColor()} 0%, transparent 100%)`,
                   }}
                 />
               </div>
-              
               <div className="mt-auto pb-4 flex items-center justify-between">
                 <motion.div
                   key={getMoodLabel()}
@@ -152,9 +124,10 @@ const MoodTracker: React.FC = () => {
                   animate={{ opacity: 1, x: 0 }}
                   className="flex items-center"
                 >
-                  <div className="text-xl font-bold" style={{ color: getMoodColor() }}>{getMoodLabel()}</div>
+                  <div className="text-xl font-bold" style={{ color: getMoodColor() }}>
+                    {getMoodLabel()}
+                  </div>
                 </motion.div>
-                
                 <motion.div
                   className="text-xl font-bold text-gray-400"
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -166,68 +139,53 @@ const MoodTracker: React.FC = () => {
               </div>
             </div>
           </div>
-          
-          {/* Main Content Section */}
-          <div  className="
-            p-4             /* mobile */
-            md:p-6          /* ≥768px */
-            lg:p-8          /* ≥1024px */
-            bg-black
-          ">
-            {/* New Futuristic Slider */}
+
+          {/* Content */}
+          <div className="p-4 md:p-6 lg:p-8 bg-black">
             <div className="mb-6">
-            <FuturisticSlider value={mood} onChange={setMood} color={getMoodColor()} />
+              <FuturisticSlider value={mood} onChange={setMood} color={getMoodColor()} />
             </div>
-            
-          {/* Prompt Card */}
-          <motion.div
-            className="bg-neutral-950 rounded-lg p-4 mb-6 border"
-            style={{ 
-              borderColor: `${getMoodColor()}40` // Add hex alpha channel (80 = 50% opacity)
-            }}
-            key={prompt}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <p className="text-gray-300 text-sm">{prompt}</p>
-          </motion.div>
-            
-            {/* Save Button */}
-            <div className="relative">
-            <motion.button
-              className="w-full py-3 px-4 rounded-lg font-medium text-white border border-gray-800 relative overflow-hidden group"
-              style={{ 
-                background: `linear-gradient(to right, ${getMoodColor()}40, ${getMoodColor()}20)`,
-              }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2 }}
-              onClick={handleSaveMood}
+
+            <motion.div
+              className="bg-neutral-950 rounded-lg p-4 mb-6 border"
+              style={{ borderColor: `${getMoodColor()}40` }}
+              key={prompt}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
             >
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
-                style={{ 
-                  background: `linear-gradient(to right, ${getMoodColor()}80, ${getMoodColor()}40)`,
+              <p className="text-gray-300 text-sm">{prompt}</p>
+            </motion.div>
+
+            <div className="relative">
+              <motion.button
+                className="w-full py-3 px-4 rounded-lg font-medium text-white border border-gray-800 relative overflow-hidden group"
+                style={{
+                  background: `linear-gradient(to right, ${getMoodColor()}40, ${getMoodColor()}20)`,
                 }}
-              />
-              <span>Save Mood</span>
-            </motion.button>
-              
-              {/* Save Confirmation */}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2 }}
+                onClick={handleSaveMood}
+              >
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                  style={{
+                    background: `linear-gradient(to right, ${getMoodColor()}80, ${getMoodColor()}40)`,
+                  }}
+                />
+                <span>Save Mood</span>
+              </motion.button>
+
               <AnimatePresence>
                 {showSaveConfirmation && (
-                  <motion.div 
+                  <motion.div
                     className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-80 rounded-lg"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    <motion.div
-                      initial={{ scale: 0.8 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0.8 }}
-                    >
+                    <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} exit={{ scale: 0.8 }}>
                       <div className="flex items-center text-white">
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: getMoodColor() }}>
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -240,14 +198,11 @@ const MoodTracker: React.FC = () => {
               </AnimatePresence>
             </div>
           </div>
-          
         </motion.div>
-        {/* … */}
       </motion.div>
     </div>
   );
 };
-
 
 interface FuturisticSliderProps {
   value: number;
@@ -258,17 +213,23 @@ interface FuturisticSliderProps {
 const FuturisticSlider: React.FC<FuturisticSliderProps> = ({ value, onChange, color }) => {
   const sliderRef = React.useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = React.useState(false);
+  const [localValue, setLocalValue] = React.useState(value);
 
-  // Compute new mood % based on pointer X
+  // Sync when parent value changes and we're not dragging
+  useEffect(() => {
+    if (!dragging) {
+      setLocalValue(value);
+    }
+  }, [value, dragging]);
+
   const calculateValue = (clientX: number) => {
     if (!sliderRef.current) return;
     const rect = sliderRef.current.getBoundingClientRect();
     const pct = ((clientX - rect.left) / rect.width) * 100;
-    onChange(Math.max(0, Math.min(100, pct)));
+    setLocalValue(Math.max(0, Math.min(100, pct)));
   };
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    // capture further pointer events until up
     e.currentTarget.setPointerCapture(e.pointerId);
     setDragging(true);
     calculateValue(e.clientX);
@@ -283,50 +244,40 @@ const FuturisticSlider: React.FC<FuturisticSliderProps> = ({ value, onChange, co
   const handlePointerUp = (e: React.PointerEvent) => {
     setDragging(false);
     e.currentTarget.releasePointerCapture(e.pointerId);
+    onChange(localValue);
   };
 
   return (
     <div className="py-4">
       <div
         ref={sliderRef}
-           className="
-     relative
-     h-12           /* mobile */
-     md:h-16        /* ≥768px */
-     lg:h-20        /* ≥1024px */
-     touch-none cursor-pointer
-  "
+        className="relative h-12 md:h-16 lg:h-20 touch-none cursor-pointer"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
       >
-        {/* Tick marks */}
         <div className="absolute inset-0 flex justify-between">
           {[...Array(25)].map((_, i) => (
-            <div key={`line-${i}`} className="h-full w-px bg-neutral-950" />
+            <div key={i} className="h-full w-px bg-neutral-950" />
           ))}
         </div>
-        {/* Center line */}
         <div className="absolute top-1/2 left-0 right-0 h-px bg-gray-800 -translate-y-1/2" />
-        {/* Indicator */}
         <motion.div
           className="absolute top-0 bottom-0 w-px"
-          style={{ left: `${value}%`, backgroundColor: color }}
-          animate={{ left: `${value}%` }}
+          style={{ left: `${localValue}%`, backgroundColor: color }}
+          animate={{ left: `${localValue}%` }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
-        {/* Filled track */}
         <motion.div
           className="absolute top-1/2 h-px -translate-y-1/2"
           style={{
-            width: `${value}%`,
+            width: `${localValue}%`,
             background: `linear-gradient(90deg, transparent 0%, ${color} 100%)`,
             boxShadow: `0 0 10px ${color}`,
           }}
-          animate={{ width: `${value}%` }}
+          animate={{ width: `${localValue}%` }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
-        {/* Labels */}
         <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-xs text-gray-500">
           {[0, 25, 50, 75, 100].map((n) => (
             <span key={n}>{n}</span>
