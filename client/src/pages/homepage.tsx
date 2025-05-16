@@ -1,16 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Navigation from "../components/Navigation";
 import MoodTracker from "../components/MoodTracker";
 import Mascot from "../components/Mascot";
 import "../styles/globals.css";
 
 
+const HIDE_DELAY_MS = 3000;
+
 const HomePage = () => {
   // track the current window width
   const [width, setWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 0
   );
-
+  
+  const scrollRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
     const onResize = () => setWidth(window.innerWidth);
     window.addEventListener("resize", onResize);
@@ -49,6 +53,58 @@ const HomePage = () => {
     ? "h-[600px]"   // ← pick whatever height you need
     : "h-auto";
 
+  // new: is the bottom nav visible?
+  const [navVisible, setNavVisible] = useState(true);
+
+  // to keep track of the current timeout so we can clear it
+  const hideTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const scheduleHide = () => {
+    // clear any existing timer
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+
+    // schedule a new one
+    hideTimer.current = setTimeout(() => {
+      setNavVisible(false);
+    }, HIDE_DELAY_MS);
+  };
+
+  useEffect(() => {
+    const handleActivity = () => {
+      setNavVisible(true);
+      scheduleHide();
+    };
+
+    const scrollEl = scrollRef.current;
+    if (scrollEl) {
+      scrollEl.addEventListener("scroll", handleActivity, { passive: true });
+    }
+
+    // on desktop: mouse & keyboard
+    window.addEventListener("mousemove", handleActivity);
+    window.addEventListener("mousedown", handleActivity);
+    window.addEventListener("click", handleActivity);
+    window.addEventListener("keydown", handleActivity);
+
+    // on mobile: touch
+    window.addEventListener("touchstart", handleActivity);
+
+    // start the auto‐hide cycle
+    scheduleHide();
+
+    return () => {
+      if (scrollEl) {
+        scrollEl.removeEventListener("scroll", handleActivity);
+      }
+      window.removeEventListener("mousemove", handleActivity);
+      window.removeEventListener("mousedown", handleActivity);
+      window.removeEventListener("click", handleActivity);
+      window.removeEventListener("keydown", handleActivity);
+      window.removeEventListener("touchstart", handleActivity);
+      if (hideTimer.current) clearTimeout(hideTimer.current);
+    };
+  }, []);
+
   // SSR-guard
   if (typeof window === "undefined") return null;
 
@@ -56,6 +112,7 @@ const HomePage = () => {
     <div className="app-container flex flex-col h-screen">
       <div className="app-content flex flex-col flex-1 w-full p-0">
         <div
+          ref={scrollRef}
           className={`
             flex-1 flex flex-col items-center overflow-y-auto
             pb-24          /* mobile: ~6rem = 96px */
@@ -85,10 +142,16 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* Navigation bar */}
-        <div className="fixed inset-x-0 bottom-0 bg-black">
-          <Navigation />
-        </div>
+      {/* Navigation bar */}
+      <div
+        className={`
+          fixed inset-x-0 bottom-0 bg-black
+          transform transition-transform duration-300
+          ${navVisible ? "translate-y-0" : "translate-y-full"}
+        `}
+      >
+        <Navigation />
+      </div>
       </div>
     </div>
   );
