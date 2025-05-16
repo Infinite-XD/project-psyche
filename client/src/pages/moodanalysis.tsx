@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import dayjs from 'dayjs';
 import {
   ResponsiveContainer,
@@ -270,13 +270,65 @@ const InsightsPanel: React.FC<{ insights: Insights }> = ({ insights }) => (
 
 // Main Component
 export default function MoodHistory() {
+  // 1️⃣ Data-loading hook
   const { data: history, loading } = useMoodHistory();
+
+  // 2️⃣ Tab state
   const [tab, setTab] = useState<Tab>('trends');
 
-  const daily = useMemo(() => computeDaily(history), [history]);
-  const weekly = useMemo(() => daily.slice(-7), [daily]);
+  // 3️⃣ Derived data
+  const daily   = useMemo(() => computeDaily(history), [history]);
+  const weekly  = useMemo(() => daily.slice(-7), [daily]);
   const buckets = useMemo(() => computeDistribution(history || []), [history]);
-  const insights = useMemo(() => history && history.length ? computeInsights(history) : null, [history]);
+  const insights = useMemo(
+    () => history.length ? computeInsights(history) : null,
+    [history]
+  );
+
+  // 4️⃣ Your new nav-visibility state + timer ref
+  const [navVisible, setNavVisible] = useState(true);
+  const hideTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // 5️⃣ scheduleHide helper
+  const scheduleHide = () => {
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    hideTimer.current = setTimeout(() => setNavVisible(false), 3000);
+  };
+
+  // ─────────────────────────────────────────────────────────────
+  // 6️⃣ Add this useEffect _right here_:
+  useEffect(() => {
+    const handleActivity = () => {
+      setNavVisible(true);
+      scheduleHide();
+    };
+
+    // page scroll
+    window.addEventListener('scroll', handleActivity, { passive: true });
+
+    // desktop
+    window.addEventListener('mousemove', handleActivity);
+    window.addEventListener('mousedown', handleActivity);
+    window.addEventListener('click', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+
+    // mobile
+    window.addEventListener('touchstart', handleActivity);
+
+    // kick off hide countdown
+    scheduleHide();
+
+    return () => {
+      window.removeEventListener('scroll', handleActivity);
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('mousedown', handleActivity);
+      window.removeEventListener('click', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+      window.removeEventListener('touchstart', handleActivity);
+      if (hideTimer.current) clearTimeout(hideTimer.current);
+    };
+  }, []);
+  // ─────────────────────────────────────────────────────────────
 
   if (loading) return (
     <div className="min-h-screen bg-black text-white p-6">
@@ -287,7 +339,8 @@ export default function MoodHistory() {
   );
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <div className="h-screen flex flex-col bg-black text-white">
+      <div className="flex-1 overflow-y-auto p-6 pb-24">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-violet-400 to-blue-500">Mood Tracker</h1>
@@ -381,8 +434,17 @@ export default function MoodHistory() {
           </div>
         )}
       </div>
-      <div className="fixed inset-x-0 bottom-0 bg-black">
-        <Navigation />
+      <div className="fixed inset-x-0 bottom-0">
+        <div
+          className={`
+            bg-black
+            transform transition-transform duration-300
+            ${navVisible ? 'translate-y-0' : 'translate-y-full'}
+          `}
+        >
+          <Navigation />
+        </div>
+      </div>
       </div>
     </div>
   );
