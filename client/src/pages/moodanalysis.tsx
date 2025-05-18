@@ -13,6 +13,8 @@ import {
   Cell
 } from 'recharts';
 import Navigation from "../components/Navigation";
+import MascotIcon from '../components/MascotIcon';
+import { Link } from "react-router-dom";
 
 // Types
 interface MoodEntry { id: number; value: number; createdAt: string; }
@@ -25,11 +27,11 @@ type Tab = 'trends' | 'stats' | 'entries';
 // Constants
 const BUCKET_SIZE = 10;
 const COLORS = {
-  low: '#F43F5E',    // rose-500
-  med: '#F59E0B',    // amber-500
-  high: '#10B981',   // emerald-500
-  primary: '#3B82F6', // blue-500
-  accent: '#8B5CF6'  // violet-500
+  low:     '#BE123C',  // rose-700
+  med:     '#B45309',  // amber-700
+  high:    '#047857',  // emerald-700
+  primary: '#7a7a7a',  // blue-700
+  accent:  '#6D28D9'   // violet-700
 };
 
 // Utility: color by value
@@ -38,7 +40,7 @@ const getColorFor = (val: number) => val <= 33 ? COLORS.low : val <= 66 ? COLORS
 // Gradient backgrounds for cards
 const gradients = {
   card: 'bg-gradient-to-br from-black to-neutral-900',
-  accent: 'bg-gradient-to-br from-blue-900/20 to-violet-900/20'
+  accent: 'bg-gradient-to-r from-gray-800 to-black shadow-lg shadow-black/20 hover:shadow-black/40 transition-all'
 };
 
 // Fetcher hook
@@ -150,16 +152,29 @@ const Loading = () => (
 const NoData = () => (
   <div className="h-64 flex flex-col items-center justify-center">
     <div className="relative mb-6">
-      <span className="text-6xl opacity-80">😶</span>
-      <div className="absolute -bottom-2 -right-2 h-6 w-6 rounded-full border-2 border-black bg-blue-500 flex items-center justify-center">
-        <span className="text-sm font-bold">+</span>
-      </div>
+        <div className="flex justify-center pt-3 pb-2">
+            <div className="animate-bounce-slow scale-75">
+                <MascotIcon />
+            </div>
+        </div>
     </div>
     <h2 className="text-lg font-medium mb-2 text-white">No mood entries yet</h2>
-    <p className="text-gray-400 text-sm mb-4">Start tracking how you feel</p>
-    <button className="mt-2 bg-gradient-to-r from-blue-500 to-violet-500 px-6 py-2.5 rounded-lg text-sm font-medium text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all">
+    <p className="text-gray-400 text-sm mb-4">Start tracking how you feel on the homepage</p>
+    <Link to="/">
+    <button
+      className="
+        mt-2
+        bg-gradient-to-r from-gray-800 to-black
+        px-6 py-2.5
+        rounded-lg
+        text-sm font-medium text-white
+        shadow-lg shadow-black/20
+        hover:shadow-black/40
+        transition-all
+      ">
       Add First Entry
     </button>
+    </Link>
   </div>
 );
 
@@ -172,7 +187,24 @@ const TabButton: React.FC<{active: boolean; onClick: () => void; label: string}>
   >
     {label}
     {active && (
-      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 to-violet-500"></span>
+    <span
+      className="
+        absolute bottom-0 left-0 
+        w-full 
+        h-1                            /* nice thick bar */
+        bg-gradient-to-r 
+          from-gray-700                 /* bright start */
+          via-gray-400                  /* very light mid */
+          to-gray-700                   /* bright end */
+        opacity-95                      /* almost solid */
+        shadow-lg                       /* strong shadow */
+        shadow-white/50                 /* white glow at 50% opacity */
+        transition-all
+      "
+    ></span>
+
+
+
     )}
   </button>
 );
@@ -181,7 +213,25 @@ const TabButton: React.FC<{active: boolean; onClick: () => void; label: string}>
 const LineGraph: React.FC<{ data: any[]; dataKey: string; xKey: string; title?: string; height?: number; formatter?: (v: string) => string }> = 
   ({ data, dataKey, xKey, title, height = 220, formatter }) => (
   <div className={`${gradients.card} p-5 rounded-xl border border-neutral-800/50 shadow-xl`}>
-    {title && <h3 className="text-lg mb-4 font-medium text-white flex items-center"><span className="h-3 w-3 rounded-full bg-gradient-to-r from-blue-500 to-violet-500 mr-2"></span>{title}</h3>}
+  {title && (
+    <h3 className="text-lg mb-4 font-medium text-white flex items-center">
+      <span
+        className="
+          h-3 w-3 rounded-full
+          bg-gradient-to-r 
+            from-gray-700                 /* bright start */
+            via-gray-400                  /* very light mid */
+            to-gray-700                   /* bright end */
+          opacity-95                      /* almost solid */
+          shadow-lg                       /* strong shadow */
+          shadow-white/50                 /* white glow at 50% opacity */
+          transition-all
+          mr-3
+        "
+      />
+      {title}
+    </h3>
+  )}
     <ResponsiveContainer width="100%" height={height}>
       <LineChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
         <defs>
@@ -212,7 +262,7 @@ const LineGraph: React.FC<{ data: any[]; dataKey: string; xKey: string; title?: 
 
 const BarGraph: React.FC<{ buckets: DistributionBucket[] }> = ({ buckets }) => (
   <div className={`${gradients.card} p-5 rounded-xl border border-neutral-800/50 shadow-xl`}>
-    <h3 className="text-lg mb-4 font-medium text-white flex items-center"><span className="h-3 w-3 rounded-full bg-gradient-to-r from-blue-500 to-violet-500 mr-2"></span>Distribution</h3>
+    <h3 className="text-lg mb-4 font-medium text-white flex items-center"><span className="h-3 w-3 rounded-full bg-gradient-to-r from-gray-700 via-gray-400 to-gray-700 opacity-95 shadow-lg shadow-white/50 mr-2"></span>Distribution</h3>
     <ResponsiveContainer width="100%" height={200}>
       <BarChart data={buckets} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} opacity={0.5} />
@@ -292,7 +342,7 @@ export default function MoodHistory() {
   // 5️⃣ scheduleHide helper
   const scheduleHide = () => {
     if (hideTimer.current) clearTimeout(hideTimer.current);
-    hideTimer.current = setTimeout(() => setNavVisible(false), 3000);
+    hideTimer.current = setTimeout(() => setNavVisible(false), 2000);
   };
 
   // ─────────────────────────────────────────────────────────────
@@ -343,7 +393,7 @@ export default function MoodHistory() {
       <div className="flex-1 overflow-y-auto p-6 pb-24">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-violet-400 to-blue-500">Mood Tracker</h1>
+          <h2 className="text-xl font-bold text-white tracking-wider">Mood Analyser</h2>
         </div>
 
         {!history.length ? <NoData /> : (
@@ -373,7 +423,7 @@ export default function MoodHistory() {
                 {insights && (
                   <div className={`${gradients.card} p-5 rounded-xl border border-neutral-800/50 shadow-xl`}>
                     <h3 className="text-lg mb-4 font-medium text-white flex items-center">
-                      <span className="h-3 w-3 rounded-full bg-gradient-to-r from-blue-500 to-violet-500 mr-2"></span>
+                      <span className="h-3 w-3 rounded-full bg-gradient-to-r from-gray-700 via-gray-400 to-gray-700 opacity-95 shadow-lg shadow-white/50 mr-2"></span>
                       Details
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -403,7 +453,7 @@ export default function MoodHistory() {
               <div className={`${gradients.card} rounded-xl border border-neutral-800/50 shadow-xl overflow-hidden`}>
                 <div className="p-4 border-b border-neutral-800/50 flex justify-between items-center">
                   <h3 className="font-medium flex items-center">
-                    <span className="h-3 w-3 rounded-full bg-gradient-to-r from-blue-500 to-violet-500 mr-2"></span>
+                    <span className="h-3 w-3 rounded-full bg-gradient-to-r from-black to-gray-500 shadow-lg shadow-black/20 transition-all mr-2"></span>
                     All Entries
                   </h3>
                   <div className="text-sm text-gray-400">{history.length} entries</div>

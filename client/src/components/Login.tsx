@@ -2,32 +2,79 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import MascotIcon from '../components/MascotIcon'; // keeping the mascot component
+import MascotIcon from '../components/MascotIcon';
+import Modal from 'react-modal'; // Add a modal library or create your own
+import { useNavigate } from 'react-router-dom';
+
+// Add modal styles if using react-modal
+Modal.setAppElement('#root');
 
 const Login: React.FC = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showErrorModal, setShowErrorModal] = useState(false);
   const { login, loading } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    console.log('👉 handleSubmit start');
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
-    try {
-      console.log('👉 about to call login()');
-      await login(usernameOrEmail, password);
-      console.log('👉 login() succeeded');
-    } catch (err) {
-      console.log('👉 login() threw:', err);
-      const msg = err instanceof Error ? err.message : 'Login failed';
-      console.log('👉 setting error state to:', msg);
-      setError(msg);
+
+    // Basic validation
+    if (!usernameOrEmail.trim() || !password.trim()) {
+      setError('Please enter both username/email and password');
+      return;
     }
+
+    try {
+      await login(usernameOrEmail, password);
+      // Login successful - navigate will be handled by AuthContext's state changes
+    } catch (err) {
+      // Handle the error from AuthContext
+      if (err instanceof Error) {
+        // Check for credential-specific errors
+        if (err.message.includes('Invalid credentials')) {
+          setError('Incorrect username/email or password');
+        } else {
+          setError(err.message || 'Login failed');
+        }
+      } else {
+        setError('An unexpected error occurred');
+      }
+      
+      // Show the error modal
+      setShowErrorModal(true);
+    }
+  };
+
+  // Close modal handler
+  const closeErrorModal = () => {
+    setShowErrorModal(false);
   };
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 sm:p-6 relative">
+
+      {/* Error Modal */}
+      <Modal
+        isOpen={showErrorModal}
+        onRequestClose={closeErrorModal}
+        className="modal-content"
+        overlayClassName="modal-overlay"
+      >
+        <div className="bg-red-800/20 p-6 rounded-xl border border-red-800/40">
+          <h3 className="text-red-300 text-lg font-bold mb-4">Login Failed</h3>
+          <p className="text-red-200">{error}</p>
+          <button
+            onClick={closeErrorModal}
+            className="mt-4 px-4 py-2 bg-red-700/30 text-red-200 rounded hover:bg-red-700/40 transition"
+          >
+            Close
+          </button>
+        </div>
+      </Modal>
+
       {/* Animated background elements - true black theme */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full opacity-20">
@@ -51,7 +98,6 @@ const Login: React.FC = () => {
         </div>
       </div>
 
-      
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6 animate-bounce-slow z-10">
         <MascotIcon/>
       </div>
@@ -95,6 +141,7 @@ const Login: React.FC = () => {
             <p className="text-center text-gray-500 text-sm sm:text-base">Sign in to continue your journey</p>
           </div>
 
+          {/* Inline error message - displayed directly on the form */}
           {error && (
             <div className="text-red-300 bg-red-900/20 px-4 py-3 rounded-xl border border-red-800/40 flex items-center space-x-3">
               <svg className="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,7 +151,11 @@ const Login: React.FC = () => {
             </div>
           )}
 
-<form onSubmit={handleSubmit} className="space-y-5">
+          <form 
+            onSubmit={handleSubmit}
+            className="space-y-5"
+            noValidate
+          >
             {[ 
               { 
                 id: 'usernameOrEmail', 

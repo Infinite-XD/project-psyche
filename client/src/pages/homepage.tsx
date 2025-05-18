@@ -3,9 +3,14 @@ import Navigation from "../components/Navigation";
 import MoodTracker from "../components/MoodTracker";
 import Mascot from "../components/Mascot";
 import "../styles/globals.css";
+import { JournalButton } from "@/components/moodjournal";
+import { EmotionExplore } from "@/components/emotionexplore";
+import { MinusButton } from "@/components/minus";
+import { PlusButton } from "@/components/plus";
 
 
-const HIDE_DELAY_MS = 800;
+
+const HIDE_DELAY_MS = 2000;
 
 const HomePage = () => {
   // track the current window width
@@ -27,7 +32,7 @@ const HomePage = () => {
   const isDesktop = width >= 1024;   // ≥1024px
 
   // mascot sizes
-  const MASCOT_MOBILE = 250;
+  const MASCOT_MOBILE = 225;
   const MASCOT_TABLET = 275;
   const MASCOT_DESKTOP = 350;
 
@@ -121,10 +126,65 @@ const HomePage = () => {
             ${isDesktop ? "gap-y-10" : isTablet ? "gap-y-8" : "gap-y-4"}
           `}
         >
-          {/* Mascot */}
-          <div className="mascot-section flex items-center justify-center">
-            <Mascot size={mascotSize} />
+      {/* Mascot + Corner Buttons */}
+      <div className="mascot-section flex items-center justify-center overflow-visible">
+        <div
+          className="relative"
+          style={{ width: `${mascotSize}px`, height: `${mascotSize}px` }}
+        >
+          <Mascot size={mascotSize} />
+
+          {/* TOP-LEFT */}
+          <div
+            className={`
+              absolute left-0 top-0
+              mt-5
+              transform
+              -translate-x-full -translate-y-1/2    /* center on corner */
+              sm:-translate-x-3 sm:-translate-y-3  /* extra 0.75rem outward on sm+ */
+            `}
+          >
+            <JournalButton />
           </div>
+
+          {/* TOP-RIGHT */}
+          <div
+            className={`
+              mt-5
+              absolute right-0 top-0
+              transform
+              translate-x-full -translate-y-1/2
+              sm:translate-x-3 sm:-translate-y-3
+            `}
+          >
+            <EmotionExplore />
+          </div>
+
+          {/* BOTTOM-LEFT */}
+          <div
+            className={`
+              absolute left-0 bottom-0
+              transform
+              -translate-x-full translate-y-1/2
+              sm:-translate-x-3 sm:translate-y-3
+            `}
+          >
+            <MinusButton />
+          </div>
+
+          {/* BOTTOM-RIGHT */}
+          <div
+            className={`
+              absolute right-0 bottom-0
+              transform
+              translate-x-full translate-y-1/2
+              sm:translate-x-3 sm:translate-y-3
+            `}
+          >
+            <PlusButton />
+          </div>
+        </div>
+      </div>
 
           {/* Mood-tracker */}
           <div

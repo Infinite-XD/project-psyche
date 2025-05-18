@@ -1,6 +1,6 @@
 // client/src/context/AuthContext.tsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';   
+  
 
 // Types
 interface User {
@@ -78,52 +78,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Login a user
-  const login = async (usernameOrEmail: string, password: string) => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usernameOrEmail, password }),
-        credentials: 'include',
-      });
+// Login
+// client/src/context/AuthContext.tsx
+const login = async (usernameOrEmail: string, password: string) => {
+  setLoading(true);
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ usernameOrEmail, password }),
+    });
 
-      // 1) grab the raw text so we can debug what's coming back
-      const text = await response.text();
-      console.log('[AuthContext.login] raw response:', response.status, text);
-
-      // 2) try to parse JSON (if possible)
-      let data: any = {};
-      try { data = JSON.parse(text); }
-      catch (_) { /* not JSON? leave data as {} */ }
-
-      // 3) if status is 401, we know it's bad credentials
-      if (response.status === 401) {
-        throw new Error('Incorrect username or password');
-      }
-
-      // 4) if non-OK status, pull any message or use generic
-      if (!response.ok) {
-        if (response.status === 401) {
-          // map server “Invalid credentials” to our own friendly text
-          throw new Error('Incorrect username or password. Please try again.');
-        }
-        throw new Error(data.message || 'Login failed. Please try again.');
-      }
-
-      // 5) sometimes backends return 200 but no user object → treat as failure
-      if (!data.user) {
-        throw new Error(data.message || 'Incorrect username or password');
-      }
-
-      // 6) success! stash the user and flip on isAuthenticated
-      setUser(data.user);
-      setIsAuthenticated(true);
-    } finally {
-      setLoading(false);
+    const data = await res.json();
+    if (res.status === 401) {
+      // server sends { message: "Invalid credentials" }
+      throw new Error(data.message || 'Invalid credentials');
     }
-  };
+    if (!res.ok) {
+      throw new Error(data.message || 'Login failed');
+    }
+    if (!data.user) {
+      throw new Error('Login failed: no user returned');
+    }
+
+    setUser(data.user);
+    setIsAuthenticated(true);
+
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
 
   // Logout a user
   const logout = async () => {
